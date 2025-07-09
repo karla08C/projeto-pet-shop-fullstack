@@ -9,6 +9,7 @@ import Servicos from './components/Servicos';
 import Contatos from './components/Contatos';
 import NotFound from './components/NotFound';
 import Footer from './components/Footer';
+import Produto from './components/Produto';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
