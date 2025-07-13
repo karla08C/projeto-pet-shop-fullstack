@@ -1,16 +1,32 @@
-
 import React from 'react';
 import { useCart } from '../context/CartContext';
-import './Carrinho.css'; 
+import Swal from 'sweetalert2'; 
+import './Carrinho.css';
 
 const Carrinho = () => {
   
-  const { cartItems, removeFromCart } = useCart();
+  const { cartItems, removeFromCart, clearCart } = useCart();
 
-  
   const total = cartItems.reduce((acc, item) => acc + item.preco * item.quantity, 0);
 
   
+  const handleFinalizarCompra = () => {
+    Swal.fire({
+      title: 'Compra Realizada!',
+      text: 'Seu pedido foi concluído com sucesso.',
+      icon: 'success', 
+      confirmButtonText: 'Ótimo!',
+      confirmButtonColor: '#28a745', 
+    }).then((result) => {
+     
+      if (result.isConfirmed) {
+        clearCart(); 
+        
+         
+      }
+    });
+  };
+
   if (cartItems.length === 0) {
     return (
       <div className="carrinho-container">
@@ -20,7 +36,6 @@ const Carrinho = () => {
     );
   }
 
-  
   return (
     <div className="carrinho-container">
       <h2>Seu carrinho de compras 🛒</h2>
@@ -42,7 +57,10 @@ const Carrinho = () => {
       </ul>
       <div className="carrinho-total">
         <h3>Total: R$ {total.toFixed(2).replace('.', ',')}</h3>
-        <button className="finalizar-compra">Finalizar Compra</button>
+        {/* 4. ADICIONE O 'onClick' AO BOTÃO */}
+        <button onClick={handleFinalizarCompra} className="finalizar-compra">
+          Finalizar Compra
+        </button>
       </div>
     </div>
   );
