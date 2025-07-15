@@ -1,20 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import Produto from '../Produto/Produto';
+import Produto from '../Produto/Produto'; 
 import './Produtos.css';
 
+//1. Criação de um "bd" simples para os produtos
+import { todosOsProdutos } from '../../data/produtosData.js';
+
 function Produtos() {
-  const todosOsProdutos = [
-    {
-      id: 1,
-      titulo: 'Golden Special',
-      preco: 126.0,
-      descricao:
-        'Ração completa para cães adultos de todas as raças. Sabor frango e carne.',
-      imagem:
-        'https://www.petz.com.br/blog/wp-content/uploads/2019/06/racao-canina.jpg',
-    },
-    // Adicione mais produtos aqui se desejar
-  ];
+  // 2. A constante 'todosOsProdutos' agora vem da importação,
+  //    não está mais declarada aqui dentro. O resto do código
+  //    continua funcionando da mesma forma!
 
   const [termoPesquisa, setTermoPesquisa] = useState('');
   const [ordenacao, setOrdenacao] = useState('nenhum');
@@ -23,7 +17,7 @@ function Produtos() {
     let produtosFiltrados = todosOsProdutos.filter(
       (produto) =>
         produto.titulo.toLowerCase().includes(termoPesquisa.toLowerCase()) ||
-        produto.descricao.toLowerCase().includes(termoPesquisa.toLowerCase()),
+        produto.descricao.toLowerCase().includes(termoPesquisa.toLowerCase())
     );
 
     switch (ordenacao) {
@@ -34,10 +28,11 @@ function Produtos() {
         produtosFiltrados.sort((a, b) => b.preco - a.preco);
         break;
       default:
+        // Nenhum ordenação extra necessária
         break;
     }
     return produtosFiltrados;
-  }, [todosOsProdutos, termoPesquisa, ordenacao]);
+  }, [termoPesquisa, ordenacao]); // Removido todosOsProdutos da dependência, pois ele não muda.
 
   return (
     <div className="app-container">
@@ -78,8 +73,6 @@ function Produtos() {
           )}
         </div>
       </section>
-
-      {/* A SEÇÃO DO CARRINHO ESTÁTICO FOI REMOVIDA DAQUI */}
     </div>
   );
 }
