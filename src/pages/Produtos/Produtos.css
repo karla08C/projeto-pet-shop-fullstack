@@ -1,5 +1,4 @@
-
-/*Lanna mexeu aqui colocando  adcionando algumas coisa*/
+/* Estilos para o container principal e overlay */
 .app-container {
   position: relative;
   background: url('../../assets/imagens/Body.png') no-repeat center;
@@ -12,26 +11,24 @@
   justify-content: flex-start;
   text-align: center;
   overflow-x: hidden;
-  overflow: hidden; /* para evitar scroll extra */
+  overflow: hidden;
 }
 
-/* Lanna mexeu aqui colocando  overlay laranja translúcido */
 .app-container::before {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background-color: rgba(255, 165, 82, 0.5); /* laranja com 50% de transparência */
-  pointer-events: none; /* permite clicar nos elementos abaixo */
+  background-color: rgba(255, 165, 82, 0.5);
+  pointer-events: none;
   z-index: 1;
 }
 
-/* Lanna mexeu aqui colocando conteúdo dentro da app-container deve ficar acima do overlay */
 .app-container > * {
   position: relative;
   z-index: 2;
 }
 
-
+/* Estilos da seção de produtos e título */
 .sectionprodutos {
   padding: 40px 0;
   text-align: center;
@@ -49,7 +46,7 @@
   text-transform: uppercase;
 }
 
-
+/* Estilos dos filtros e pesquisa */
 .filtros-container {
   margin-bottom: 30px;
   display: flex;
@@ -86,12 +83,14 @@
   cursor: pointer;
 }
 
+/* Estilo da lista de produtos (grade) */
 .produtos-lista {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  gap: 30px; /* Espaçamento entre os cards */
   justify-content: center;
   margin-top: 30px;
+  padding: 0 15px; /* Evita que os cards colem nas bordas */
 }
 
 .nenhum-produto-encontrado {
@@ -101,6 +100,7 @@
   width: 100%; 
 }
 
+/* O restante do seu CSS para #carrinho-container e media queries */
 #carrinho-container {
   max-width: 600px;
   margin: 30px auto;
@@ -150,7 +150,7 @@
   background-color: #cc0000;
 }
 
-
+/* Estilos responsivos */
 @media (max-width: 768px) {
   .filtros-container {
     flex-direction: column; 
@@ -159,8 +159,8 @@
 
   .barra-pesquisa,
   .dropdown-ordenacao {
-    width: 90%; /* Ajusta a largura para telas menores */
-    max-width: unset; /* Remove o max-width para ocupar mais espaço */
+    width: 90%;
+    max-width: unset;
   }
 
   .produtos-lista {
