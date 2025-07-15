@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import Produto from './Produto';
+import Produto from '../Produto/Produto';
 import './Produtos.css';
 
 function Produtos() {
@@ -68,11 +68,8 @@ function Produtos() {
 
         <div className="produtos-lista">
           {produtosExibidos.length > 0 ? (
-            produtosExibidos.map(produto => (
-              <Produto
-                key={produto.id}
-                produto={produto}
-              />
+            produtosExibidos.map((produto) => (
+              <Produto key={produto.id} produto={produto} />
             ))
           ) : (
             <p className="nenhum-produto-encontrado">
@@ -83,7 +80,6 @@ function Produtos() {
       </section>
 
       {/* A SEÇÃO DO CARRINHO ESTÁTICO FOI REMOVIDA DAQUI */}
-
     </div>
   );
 }

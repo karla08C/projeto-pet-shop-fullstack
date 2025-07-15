@@ -1,0 +1,174 @@
+.contato-section {
+  position: relative;
+  background: url('../../assets/imagens/Body.png') no-repeat center;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 4rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  color: #FFA552 !important;
+}
+
+.contato-section * {
+  color: #FFA552 !important;
+}
+
+/* Container interno */
+.contato-section .contato-container {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  background-color: rgba(255, 250, 245, 0.95);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  border: 2px solid #FFA552;
+  backdrop-filter: blur(3px);
+}
+
+/* Títulos */
+.contato-section h2 {
+  font-size: 2.8rem;
+  font-family: 'Brush Script MT', cursive;
+  margin-bottom: 1.5rem;
+  text-shadow: none;
+  color: #FFA552 !important;
+}
+
+.contato-section h3 {
+  font-size: 1.5rem;
+  font-family: 'Georgia', serif;
+  margin-top: 1.5rem;
+  text-shadow: none;
+  color: #FFA552 !important;
+}
+
+/* Parágrafos */
+.contato-section p {
+  font-family: 'Georgia', serif;
+  font-size: 1.3rem;
+  line-height: 1.7;
+  margin-bottom: 1.2rem;
+  color: #FFA552 !important;
+  text-shadow: none;
+}
+
+/* Ícones sociais */
+.contato-section .social-icons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.contato-section .icon {
+  font-size: 1.8rem;
+  background-color: rgba(249, 250, 251, 0.15);
+  padding: 0.8rem;
+  border-radius: 10px;
+  color: #FFA552 !important;
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.contato-section .icon:hover {
+  background-color: #FFA552;
+  color: #3e2723 !important;
+}
+
+/* Lista de contato */
+.contato-section .contact {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.contato-section .contact li {
+  margin-bottom: 1.5rem;
+}
+
+.contato-section .contact a {
+  color: #FFA552 !important;
+  text-decoration: none;
+  word-break: break-word;
+}
+
+.contato-section .contact a:hover {
+  text-decoration: underline;
+}
+
+.contato-section .icon {
+  font-size: 2rem;                    /* tamanho maior e melhor visibilidade */
+  background-color: rgba(255, 165, 82, 0.2); /* fundo laranja suave e translúcido */
+  padding: 1rem;                     /* espaçamento maior */
+  border-radius: 50%;                /* deixa o fundo redondo */
+  color: #FFA552 !important;        /* cor do ícone */
+  text-decoration: none;
+  box-shadow: 0 4px 8px rgba(255, 165, 82, 0.4); /* sombra laranja suave */
+  transition: 
+    background-color 0.3s ease,
+    color 0.3s ease,
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.contato-section .icon:hover {
+  background-color: #FFA552;        /* fundo laranja vibrante */
+  color: #3e2723 !important;        /* texto escuro */
+  box-shadow: 0 6px 15px rgba(255, 165, 82, 0.7); /* sombra mais intensa */
+  transform: scale(1.1);            /* leve zoom ao passar o mouse */
+}
+
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .contato-section .contato-container {
+    padding: 1.5rem;
+  }
+
+  .contato-section h2 {
+    font-size: 2.3rem;
+  }
+
+  .contato-section h3 {
+    font-size: 1.3rem;
+  }
+
+  .contato-section p {
+    font-size: 1.1rem;
+  }
+
+  .contato-section .icon {
+    font-size: 1.6rem;
+    padding: 0.6rem;
+  }
+
+  .contato-section .contact {
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .contato-section h2 {
+    font-size: 2rem;
+  }
+
+  .contato-section p {
+    font-size: 1rem;
+  }
+
+  .contato-section .icon {
+    font-size: 1.4rem;
+    padding: 0.5rem;
+  }
+}

@@ -1,15 +1,40 @@
 
-
+/*Lanna mexeu aqui colocando  adcionando algumas coisa*/
 .app-container {
-  font-family: Arial, sans-serif;
-  padding: 0;
-  background-color: #f8f8f8;
-  color: #333;
+  position: relative;
+  background: url('../../assets/imagens/Body.png') no-repeat center;
+  background-size: cover;
+  min-height: 100vh;
+  padding: 4rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  overflow-x: hidden;
+  overflow: hidden; /* para evitar scroll extra */
 }
 
+/* Lanna mexeu aqui colocando  overlay laranja translúcido */
+.app-container::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(255, 165, 82, 0.5); /* laranja com 50% de transparência */
+  pointer-events: none; /* permite clicar nos elementos abaixo */
+  z-index: 1;
+}
+
+/* Lanna mexeu aqui colocando conteúdo dentro da app-container deve ficar acima do overlay */
+.app-container > * {
+  position: relative;
+  z-index: 2;
+}
+
+
 .sectionprodutos {
+  padding: 40px 0;
   text-align: center;
-  margin-bottom: 60px
 }
 
 .h2produtos {

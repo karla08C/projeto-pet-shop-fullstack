@@ -2,7 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Nav, Container } from 'react-bootstrap';
 import { FaShoppingCart } from 'react-icons/fa'; // <-- 1. Importa o ícone
-import { useCart } from '../context/CartContext'; // <-- 2. Importa o hook do carrinho
+import { useCart } from '../../context/CartContext';
+// <-- 2. Importa o hook do carrinho
 import './Header.css';
 
 function Header() {
@@ -12,7 +13,12 @@ function Header() {
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <Navbar expand="lg" style={{ backgroundColor: '#8B4513' }} variant="dark" sticky="top">
+    <Navbar
+      expand="lg"
+      style={{ backgroundColor: '#8B4513' }}
+      variant="dark"
+      sticky="top"
+    >
       <Container>
         <Navbar.Brand as={Link} to="/">
           Pet Shop Feliz
@@ -32,13 +38,17 @@ function Header() {
             <Nav.Link as={Link} to="/serviços">
               Serviços
             </Nav.Link>
-            <Nav.Link as={Link} to="/contato">
-              Contato
+
+            <Nav.Link as={Link} to="/historia">
+              Nossa História
             </Nav.Link>
             <Nav.Link as={Link} to="/sobre">
               Sobre
             </Nav.Link>
-            
+            <Nav.Link as={Link} to="/contato">
+              Contato
+            </Nav.Link>
+
             {/*-- 5. Adicione o link do carrinho aqui --*/}
             <Nav.Link as={Link} to="/carrinho" className="cart-link">
               <FaShoppingCart size="1.2em" />
@@ -46,7 +56,6 @@ function Header() {
                 <span className="cart-badge">{totalItems}</span>
               )}
             </Nav.Link>
-
           </Nav>
         </Navbar.Collapse>
       </Container>
