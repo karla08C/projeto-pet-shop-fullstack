@@ -4,9 +4,9 @@ import './Historia.css'; // Lembre-se de criar esse CSS
 function Historia() {
   return (
     <section id="main" className="historia-section">
-      <div className="container">
+      <div className="container-historia">
         <div className="order-box">
-          <article className="box post">
+          <article className="boxH post">
             <header>
               <h1>🐾 Nossa História 🐾</h1>
             </header>

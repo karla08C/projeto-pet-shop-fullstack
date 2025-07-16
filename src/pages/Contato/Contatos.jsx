@@ -12,7 +12,7 @@ function Contatos() {
     <section id="main" className="contato-section">
       <div className="container">
         <div className="order-box">
-          <article className="box post">
+          <article className="boxC post">
             <header>
               <h1>🐾 Nos encontre através de: 🐾</h1>
             </header>
