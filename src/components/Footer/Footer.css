@@ -1,4 +1,4 @@
-.footer{
+.footer {
   background-color: #8b5e3c;
   color: #fff;
   text-align: center;
@@ -9,23 +9,25 @@
 }
 
 .footer .container {
-max-width: 1200px;
-margin: 0;
+  max-width: 1200px;
+  margin: 0 auto; /* centraliza horizontalmente */
+  width: 100%;
 }
 
-.footer p{
+.footer p {
   margin: 5px 0;
   font-family: 'Georgia', serif;
   font-size: 1rem;
   color: #FFA552 !important;
+  text-align: center; /* reforçando o alinhamento do texto */
 }
 
-/* Responsividade*/
-@media (max-width: 768px){
+/* Responsividade */
+@media (max-width: 768px) {
   .footer {
-  padding: 15px 0;
+    padding: 15px 0;
   }
-  .footer p{
+  .footer p {
     font-size: 0.9rem;
   }
 }

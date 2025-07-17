@@ -13,6 +13,8 @@ import Contatos from './pages/Contato/Contatos';
 import Footer from './components/Footer/Footer';
 import Produto from './pages/Produto/Produto';
 import Historia from './pages/Historia/Historia';
+import Buscar from './pages/Buscar/Buscar';
+import Login from './pages/Login/Login';
 
 // IMPORTAÇÕES GLOBAIS
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -40,7 +42,7 @@ function App() {
 
         <Header />
         <Routes>
-          <Route path="/" element={<Inicio />} />
+          <Route path="/inicio" element={<Inicio />} />
           <Route path="/agendamento" element={<Agendamento />} />
           <Route path="/produtos" element={<Produtos />} />
           <Route path="/carrinho" element={<Carrinho />} />
@@ -48,6 +50,8 @@ function App() {
           <Route path="/contato" element={<Contatos />} />
           <Route path="/sobre" element={<Sobre />} />
           <Route path="/historia" element={<Historia />} />
+          <Route path="/buscar" element={<Buscar />} />
+          <Route path="/login" element={<Login />} />
         </Routes>
         <Footer />
       </CartProvider>{' '}

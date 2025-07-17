@@ -16,7 +16,7 @@ function Inicio() {
             <h2>Agendamentos</h2>
           </header>
           <div className="row">
-            <div className="col-6 col-12-small">
+            <div className="col-4 col-6-medium col-12-small">
               <section className="box">
                 <h3>Novo Agendamento</h3>
                 <p>Marque banho, tosa ou consulta veterinária</p>
@@ -27,7 +27,7 @@ function Inicio() {
                 </footer>
               </section>
             </div>
-            <div className="col-6 col-12-small">
+            <div className="col-4 col-6-medium col-12-small">
               <section className="box">
                 <h3>Meus Agendamentos</h3>
                 <p>Visualize ou cancele agendamentos existentes</p>

@@ -1,65 +1,113 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Navbar, Nav, Container } from 'react-bootstrap';
-import { FaShoppingCart } from 'react-icons/fa'; // <-- 1. Importa o ícone
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  Navbar,
+  Nav,
+  Container,
+  Form,
+  FormControl,
+  Button,
+} from 'react-bootstrap';
+import { FaShoppingCart, FaUser } from 'react-icons/fa'; // Importando o ícone de login
 import { useCart } from '../../context/CartContext';
-// <-- 2. Importa o hook do carrinho
 import './Header.css';
 
 function Header() {
-  const { cartItems } = useCart(); // <-- 3. Usa o hook para pegar os itens
+  const navigate = useNavigate();
+  const { cartItems } = useCart();
+  const [search, setSearch] = useState('');
 
-  // 4. Calcula a quantidade total de itens no carrinho
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (search.trim()) {
+      navigate(`/buscar?query=${encodeURIComponent(search)}`);
+    }
+  };
+
   return (
-    <Navbar
-      expand="lg"
-      style={{ backgroundColor: '#8B4513' }}
-      variant="dark"
-      sticky="top"
-    >
-      <Container>
-        <Navbar.Brand as={Link} to="/">
-          Pet Shop Feliz
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="ms-auto">
-            <Nav.Link as={Link} to="/">
-              Início
-            </Nav.Link>
-            <Nav.Link as={Link} to="/agendamento">
-              Agendamentos
-            </Nav.Link>
-            <Nav.Link as={Link} to="/produtos">
-              Produtos
-            </Nav.Link>
-            <Nav.Link as={Link} to="/serviços">
-              Serviços
-            </Nav.Link>
+    <>
+      {/* Barra de pesquisa fixa no topo */}
+      <Navbar
+        variant="dark"
+        className="py-2 navbar-search-bar"
+        style={{ backgroundColor: '#8B4513' }}
+      >
+        <Container className="justify-content-center">
+          <Form
+            className="d-flex w-100"
+            onSubmit={handleSearch}
+            style={{ maxWidth: '400px' }}
+          >
+            <FormControl
+              type="search"
+              placeholder="Pesquisar"
+              className="me-2"
+              aria-label="Pesquisar"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <Button variant="outline-light" type="submit">
+              Buscar
+            </Button>
+          </Form>
+        </Container>
+      </Navbar>
 
-            <Nav.Link as={Link} to="/historia">
-              Nossa História
-            </Nav.Link>
-            <Nav.Link as={Link} to="/sobre">
-              Sobre
-            </Nav.Link>
-            <Nav.Link as={Link} to="/contato">
-              Contato
-            </Nav.Link>
+      {/* Navbar principal logo abaixo da barra de pesquisa */}
+      <Navbar
+        expand="lg"
+        variant="dark"
+        className="navbar-principal"
+        style={{ backgroundColor: '#8B4513' }}
+      >
+        <Container>
+          <Navbar.Brand as={Link} to="/">
+            Pet Shop Feliz
+          </Navbar.Brand>
+          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+          <Navbar.Collapse id="basic-navbar-nav">
+            <Nav className="ms-auto">
+              <Nav.Link as={Link} to="/inicio">
+                Início
+              </Nav.Link>
+              <Nav.Link as={Link} to="/agendamento">
+                Agendamentos
+              </Nav.Link>
+              <Nav.Link as={Link} to="/produtos">
+                Produtos
+              </Nav.Link>
+              <Nav.Link as={Link} to="/serviços">
+                Serviços
+              </Nav.Link>
+              <Nav.Link as={Link} to="/historia">
+                Nossa História
+              </Nav.Link>
+              <Nav.Link as={Link} to="/sobre">
+                Sobre
+              </Nav.Link>
+              <Nav.Link as={Link} to="/contato">
+                Contato
+              </Nav.Link>
 
-            {/*-- 5. Adicione o link do carrinho aqui --*/}
-            <Nav.Link as={Link} to="/carrinho" className="cart-link">
-              <FaShoppingCart size="1.2em" />
-              {totalItems > 0 && (
-                <span className="cart-badge">{totalItems}</span>
-              )}
-            </Nav.Link>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+              {/* Carrinho */}
+              <Nav.Link as={Link} to="/carrinho" className="cart-link">
+                <FaShoppingCart size="1.2em" />
+                {totalItems > 0 && (
+                  <span className="cart-badge">{totalItems}</span>
+                )}
+              </Nav.Link>
+
+              {/* Login */}
+              <Nav.Link as={Link} to="/login" className="login-link">
+                <FaUser size="1.2em" />
+              </Nav.Link>
+            </Nav>
+          </Navbar.Collapse>
+        </Container>
+      </Navbar>
+    </>
   );
 }
 
