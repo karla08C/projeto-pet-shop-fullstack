@@ -26,8 +26,10 @@ Este projeto foi desenvolvido **em equipe**, promovendo o aprendizado colaborati
 
 - [Janiele](https://github.com/janiele376)  
 - [Jennifer](https://github.com/karla08C)  
-- [Lanna Maria](https://github.com/lanna-maria)  
-- [Saul](https://github.com/SAUL-ALVES)
+- [Lanna Maria](https://github.com/lanna-maria)
+- Pedro Panzo (https://github.com/pedropanzo).
+- [Saul]
+- (https://github.com/SAUL-ALVES)
 
 > ✅ Sinta-se à vontade para clonar, estudar e se inspirar neste projeto!
 
