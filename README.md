@@ -46,6 +46,20 @@ Este projeto foi desenvolvido **em equipe**, promovendo o aprendizado colaborati
 - **HTML5 e CSS3** – estrutura e estilo base  
 - **JavaScript (ES6+)** – lógica da aplicação
 
+## 📄 Documentação do Projeto
+
+A documentação de qualidade (QA) do projeto está disponível em formato PDF, contendo:
+
+- Histórico do projeto
+- Estrutura de equipes e responsabilidades
+- Tecnologias utilizadas
+- Fases de desenvolvimento e principais desafios
+- Observações e erros identificados pela equipe de QA
+
+👉 [Clique aqui para acessar a documentação completa (PDF)](./docs/documentacao-projeto-petshop.pdf)
+
+
+
 ## 📦 Instalação e Uso Local
 
 ```bash
