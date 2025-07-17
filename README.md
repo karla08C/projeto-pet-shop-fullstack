@@ -32,7 +32,6 @@ Este projeto foi desenvolvido **em equipe**, promovendo o aprendizado colaborati
   (https://github.com/lanna-maria);
 - Pedro Panzo (https://github.com/pedropanzo);
 - Saul
-
 (https://github.com/SAUL-ALVES).
 
 > ✅ Sinta-se à vontade para clonar, estudar e se inspirar neste projeto!
