@@ -56,8 +56,7 @@ A documentação de qualidade (QA) do projeto está disponível em formato PDF, 
 - Fases de desenvolvimento e principais desafios
 - Observações e erros identificados pela equipe de QA
 
-👉 [Clique aqui para acessar a documentação completa (PDF)](./docs/documentacao-projeto-petshop.pdf)
-
+👉 [Visualizar Documentação (PDF)](src/docs/documentacao-projeto-petshop.pdf)
 
 
 ## 📦 Instalação e Uso Local
