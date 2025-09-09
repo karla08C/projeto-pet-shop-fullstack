@@ -1,0 +1,231 @@
+.order-container {
+  position: relative;
+background: url('../../assets/imagens/Body.png') no-repeat center;
+
+  background-size: cover;
+  color: #F9FAFB;
+  min-height: 100vh;
+  padding: 4rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  overflow-x: hidden;
+}
+.order-box {
+  position: relative;
+  background-color: #ffffff; /* Fundo branco */
+  padding: 2rem;
+  border-radius: 16px;
+  border: 2px solid #FFA552; /* borda caramelo */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(3px);
+  max-width: 900px;
+  width: 100%;
+  z-index: 2;
+  color: #3e2723; /* texto escuro para contraste */
+}
+
+
+
+.order-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(139, 94, 60, 0.75); /* marrom caramelo translúcido */
+  z-index: 0;
+}
+
+.order-container * {
+  position: relative;
+  z-index: 1;
+}
+
+.order-container h2 {
+  font-size: 3rem;
+  font-family: 'Brush Script MT', cursive;
+  color: #FFA552;
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+  width: 100%;
+  max-width: 500px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  font-family: 'Georgia', serif;
+  color: #FFA552;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.category-button  {
+  background-color: #FFA552 !important;
+  color: #8b5e3c !important;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-weight: bold;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  text-shadow: none;
+  text-transform: none;
+}
+
+
+.category-button:hover {
+  background-color: #f59e3b;
+  color: white !important;
+}
+
+
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 2px solid #FFA552; /* borda caramelo */
+  border-radius: 8px;
+  font-size: 1rem;
+  background-color: #fff; /* fundo branco para melhor contraste */
+  color: #3e2723;
+  transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: #f59e3b; /* borda mais forte no foco */
+  outline: none;
+}
+
+.menu-category-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.category-button {
+  background-color: #FFA552; /* mesma cor do botão de agendamento */
+  color: #3e2723;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  font-weight: bold;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.category-button:hover {
+  background-color: #f59e3b; /* cor no hover igual ao de agendamento */
+  color: white;
+}
+
+
+.order-summary {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 2rem;
+  color: #F9FAFB;
+  font-family: 'Georgia', serif;
+}
+
+.order-summary li {
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+}
+.modal-footer .btn-primary {
+  background-color: #8B4513;
+  border-color: #8B4513;
+  color: #ffffff;
+}
+
+.modal-footer .btn-primary:hover {
+  background-color: #A0522D;
+  border: #A0522D;
+}
+button[type="submit"],
+.btn-success   {
+  background-color: #FFA552;
+  color: #8b5e3c;
+  font-weight: bold;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  transition: 0.3s;
+  margin-top: 1rem;
+}
+
+button[type="submit"]:hover,
+.btn-success:hover {
+  background-color: #f59e3b;
+  color: white;
+}
+
+/* Estilo para o modal (opcional, pois Bootstrap cuida bem, mas pode personalizar) */
+.modal-content {
+  background-color: #fff7f2;
+  border-radius: 12px;
+  color: #3e2723;
+}
+
+.modal-header,
+.modal-footer {
+  border: none;
+}
+
+.modal-title {
+  color: #FFA552;
+  font-family: 'Georgia', serif;
+}
+
+.form-control {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #3e2723;
+}
+
+/* ✅ RESPONSIVO */
+@media (max-width: 768px) {
+  .order-container {
+    padding: 2rem 1rem;
+  }
+
+  .order-container h2 {
+    font-size: 2.2rem;
+  }
+
+  .form-group {
+    max-width: 100%;
+  }
+
+  .category-button {
+    font-size: 0.9rem;
+    padding: 0.6rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-container h2 {
+    font-size: 2rem;
+  }
+
+  .category-button {
+    width: 100%;
+    text-align: center;
+  }
+}

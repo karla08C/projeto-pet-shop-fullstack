@@ -1,0 +1,133 @@
+/* ============================
+   Estilo geral da navbar
+============================ */
+
+/* Cor de fundo da navbar */
+.navbar {
+  background-color: #8b5e3c !important; /* marrom caramelo */
+}
+
+/* Estilo do nome/marca na navbar */
+.navbar-brand {
+  color: #FFA552 !important; /* laranja suave */
+  font-family: 'Brush Script MT', cursive;
+  font-size: 2rem;
+}
+
+/* Efeito hover na marca */
+.navbar-brand:hover {
+  color: white !important;
+}
+
+/* ============================
+   Estilo dos links de navegação
+============================ */
+
+/* Links do menu de navegação */
+.navbar-nav .nav-link {
+  color: #FFA552 !important; /* laranja suave */
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+/* Hover nos links */
+.navbar-nav .nav-link:hover {
+  background-color: #f59e3b; /* cor ao passar o mouse */
+  color: white !important;
+  border-radius: 5px; /* cantos arredondados */
+}
+
+/* ============================
+   Botão de toggle (menu colapsado)
+============================ */
+
+/* Remove a borda do botão hamburguer */
+.navbar-toggler {
+  border: none !important;
+}
+
+/* Ícone personalizado para o botão de menu hamburguer */
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,165,82,0.8)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
+}
+
+/* ============================
+   Estilo da barra de pesquisa
+============================ */
+
+/* Input e botão da barra de pesquisa */
+.navbar-search-bar .form-control,
+.navbar-search-bar .btn {
+  height: 32px;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.75rem;
+  line-height: 1.2;
+  box-sizing: border-box;
+}
+
+/* Remove espaçamento superior do botão */
+.navbar-search-bar .btn {
+  margin-top: 0;
+}
+
+/* Estilo do campo de pesquisa */
+.navbar-search-bar .form-control {
+  border: 2px solid #FFA552;
+  border-radius: 10px;         /* cantos arredondados */
+  outline: none;               /* remove contorno azul */
+}
+
+/* Foco no campo de pesquisa */
+.navbar-search-bar .form-control:focus {
+  border-color: #A0522D;       /* borda marrom mais escura */
+  box-shadow: none;            /* remove brilho padrão */
+}
+
+/* ============================
+   Carrinho e Login
+============================ */
+
+/* Estilo base para os ícones de carrinho e login */
+.cart-link,
+.login-link {
+  margin-left: 10px;
+  position: relative;
+  color: #FFA552 !important;
+}
+
+/* Indicador de quantidade no carrinho */
+.cart-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background-color: red;
+  color: white;
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 50%; /* bolinha */
+}
+
+/* Centraliza verticalmente os ícones */
+.cart-link svg,
+.login-link svg {
+  vertical-align: middle;
+}
+
+/* Hover específico para o login, se quiser destacar igual os outros */
+.login-link:hover {
+  background-color: #f59e3b;
+  border-radius: 5px;
+  color: white !important;
+}
+
+/* ============================
+   Responsividade (opcional)
+============================ */
+
+@media (max-width: 576px) {
+  .cart-link,
+  .login-link {
+    margin-left: 5px; /* reduz espaço em telas pequenas */
+  }
+}
