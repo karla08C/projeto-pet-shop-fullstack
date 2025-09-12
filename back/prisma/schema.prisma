@@ -13,3 +13,78 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Usuario {
+  id              Int       @id @default(autoincrement())
+  nome            String    @db.VarChar(100)
+  email           String    @unique @db.VarChar(100)
+  senha           String    @db.VarChar(255)
+  tipo            String    @db.VarChar(20) // 'cliente' ou 'vendedor'
+  cpf_cnpj        String?   @unique @db.VarChar(20)
+  telefone        String?   @db.VarChar(20)
+  endereco        String?
+  data_criacao    DateTime  @default(now())
+  data_atualizacao DateTime @default(now()) @updatedAt
+  
+  // Relações
+  produtos_vendidos Produto[]  @relation("VendedorProdutos")
+  vendas_realizadas Venda[]    @relation("VendedorVendas")
+  compras_realizadas Venda[]   @relation("ClienteVendas")
+  
+  @@map("usuarios")
+}
+
+model Produto {
+  id              Int       @id @default(autoincrement())
+  nome            String    @db.VarChar(100)
+  descricao       String?
+  preco           Float     @db.Decimal(10, 2)
+  estoque         Int       @default(0)
+  vendedor_id     Int
+  categoria       String?   @db.VarChar(50)
+  imagem_url      String?   @db.VarChar(255)
+  ativo           Boolean   @default(true)
+  data_criacao    DateTime  @default(now())
+  data_atualizacao DateTime @default(now()) @updatedAt
+  
+  // Relações
+  vendedor        Usuario   @relation("VendedorProdutos", fields: [vendedor_id], references: [id], onDelete: Cascade)
+  itens_venda     ItemVenda[]
+  
+  @@map("produtos")
+}
+
+model Venda {
+  id              Int       @id @default(autoincrement())
+  cliente_id      Int
+  vendedor_id     Int
+  data_venda      DateTime  @default(now())
+  status          String    @default("pendente") @db.VarChar(20)
+  total           Float     @db.Decimal(10, 2)
+  forma_pagamento String?   @db.VarChar(50)
+  endereco_entrega String?
+  data_atualizacao DateTime @default(now()) @updatedAt
+  
+  // Relações
+  cliente         Usuario   @relation("ClienteVendas", fields: [cliente_id], references: [id], onDelete: Restrict)
+  vendedor        Usuario   @relation("VendedorVendas", fields: [vendedor_id], references: [id], onDelete: Restrict)
+  itens           ItemVenda[]
+  
+  @@map("vendas")
+}
+
+model ItemVenda {
+  id              Int       @id @default(autoincrement())
+  venda_id        Int
+  produto_id      Int
+  quantidade      Int
+  preco_unitario  Float     @db.Decimal(10, 2)
+  subtotal        Float     @db.Decimal(10, 2)
+  
+  // Relações
+  venda           Venda     @relation(fields: [venda_id], references: [id], onDelete: Cascade)
+  produto         Produto   @relation(fields: [produto_id], references: [id], onDelete: Restrict)
+  
+  @@map("itens_venda")
+  @@unique([venda_id, produto_id])
+}
