@@ -5,39 +5,73 @@ import jwt from "jsonwebtoken";
 
 const router = express.Router();
 const prisma = new PrismaClient();
-const SECRET = "segredo123"; 
 
 // Registro de usuário
-router.post("/register", async (req, res) => {
-  const { name, email, password, role } = req.body;
+router.post('/register', async (req, res) => {
+  const { nome, email, senha, tipo } = req.body;
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  if (!nome || !email || !senha || !tipo) {
+    return res.status(400).json({ error: 'Todos os campos são obrigatórios.' });
+  }
 
   try {
-    const user = await prisma.user.create({
-      data: { name, email, password: hashedPassword, role },
+    const senhaHash = await bcrypt.hash(senha, 10);
+    const novoUsuario = await prisma.usuario.create({
+      data: {
+        nome,
+        email,
+        senha: senhaHash,
+        tipo,
+      },
     });
-    res.json(user);
-  } catch (err) {
-    res.status(400).json({ error: "Usuário já existe" });
+    // Remove a senha da resposta por segurança
+    delete novoUsuario.senha;
+    res.status(201).json({ message: 'Usuário criado com sucesso!', usuario: novoUsuario });
+  } catch (error) {
+    if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+      return res.status(409).json({ error: 'Este e-mail já está em uso.' });
+    }
+    res.status(500).json({ error: 'Erro ao criar usuário.' });
   }
 });
 
 // Login
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-  const user = await prisma.user.findUnique({ where: { email } });
+  // CORRIGIDO: Usando 'senha' para manter a consistência
+  const { email, senha } = req.body;
 
-  if (!user) return res.status(400).json({ error: "Usuário não encontrado" });
+  // MELHORIA: Validação de entrada
+  if (!email || !senha) {
+    return res.status(400).json({ error: "Email e senha são obrigatórios" });
+  }
+  
+  try {
+    // CORRIGIDO: O model é 'usuario', não 'user'
+    const usuario = await prisma.usuario.findUnique({ where: { email } });
 
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(400).json({ error: "Senha inválida" });
+    if (!usuario) {
+      return res.status(404).json({ error: "Usuário não encontrado" });
+    }
+    
+    // CORRIGIDO: Comparando 'senha' do body com 'usuario.senha' do banco
+    const senhaValida = await bcrypt.compare(senha, usuario.senha);
+    
+    if (!senhaValida) {
+      return res.status(401).json({ error: "Senha inválida" });
+    }
 
-  const token = jwt.sign({ id: user.id, role: user.role }, SECRET, {
-    expiresIn: "1d",
-  });
+    // MELHORIA: Usando variável de ambiente para o segredo do JWT
+    const token = jwt.sign(
+      // CORRIGIDO: O campo no banco é 'tipo', não 'role'
+      { id: usuario.id, role: usuario.tipo }, 
+      process.env.JWT_SECRET, 
+      { expiresIn: "1h" }
+    );
 
-  res.json({ token });
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ error: "Erro interno no servidor" });
+  }
 });
 
 export default router;

@@ -5,103 +5,99 @@ import { auth } from "../middleware/auth.js";
 const router = express.Router();
 const prisma = new PrismaClient();
 
-// Finalizar compra
+
 router.post("/", auth, async (req, res) => {
-  if (req.user.role !== "cliente") {
-    return res.status(403).json({ error: "Apenas clientes podem finalizar compras" });
+  
+  const { items, forma_pagamento, endereco_entrega } = req.body;
+  const clienteId = req.user.id; 
+
+  if (!items || items.length === 0) {
+    return res.status(400).json({ error: "O carrinho não pode estar vazio." });
   }
 
-  const { products, vendorId } = req.body; 
-  // products = [{id:1, quantity:2}, {id:2, quantity:1}]
-
   try {
-    // Verificar estoque
-    for (const p of products) {
-      const product = await prisma.product.findUnique({ where: { id: p.id } });
-      if (!product || product.stock < p.quantity) {
-        return res.status(400).json({ error: `Estoque insuficiente para o produto ${p.id}` });
-      }
-    }
+    const productIds = items.map(item => item.productId);
 
-    // Criar venda
-    const sale = await prisma.sale.create({
-      data: {
-        clientId: req.user.id,
-        vendorId,
-        status: "ativa"
-      }
-    });
+    
+    const novaVenda = await prisma.$transaction(async (tx) => {
+      
+      const produtosNoCarrinho = await tx.produto.findMany({
+        where: { id: { in: productIds } },
+      });
 
-    // Criar relação dos produtos
-    for (const p of products) {
-      await prisma.saleProduct.create({
-        data: {
-          saleId: sale.id,
-          productId: p.id,
-          quantity: p.quantity
+      
+      const primeiroVendedorId = produtosNoCarrinho[0]?.vendedor_id;
+      if (!primeiroVendedorId || produtosNoCarrinho.some(p => p.vendedor_id !== primeiroVendedorId)) {
+        throw new Error("Todos os produtos do carrinho devem pertencer ao mesmo vendedor.");
+      }
+
+      let totalVenda = 0;
+      const itensParaCriar = [];
+
+      
+      for (const item of items) {
+        const produto = produtosNoCarrinho.find(p => p.id === item.productId);
+
+        if (!produto) {
+          throw new Error(`Produto com ID ${item.productId} não encontrado.`);
         }
+        if (produto.estoque < item.quantity) {
+          throw new Error(`Estoque insuficiente para o produto: ${produto.nome}. Disponível: ${produto.estoque}`);
+        }
+        if (!produto.ativo) {
+          throw new Error(`O produto ${produto.nome} não está mais disponível para venda.`);
+        }
+
+        const subtotal = produto.preco * item.quantity;
+        totalVenda += subtotal;
+
+        itensParaCriar.push({
+          produto_id: item.productId,
+          quantidade: item.quantity,
+          preco_unitario: produto.preco,
+          subtotal: subtotal,
+        });
+      }
+
+      
+      const venda = await tx.venda.create({
+        data: {
+          cliente_id: clienteId,
+          vendedor_id: primeiroVendedorId,
+          total: totalVenda,
+          forma_pagamento: forma_pagamento,
+          endereco_entrega: endereco_entrega,
+          status: "processando", 
+          itens: {
+            create: itensParaCriar,
+          },
+        },
+        include: {
+          itens: true, 
+        },
       });
 
-      // Atualizar estoque
-      await prisma.product.update({
-        where: { id: p.id },
-        data: { stock: { decrement: p.quantity } }
-      });
-    }
+      
+      for (const item of items) {
+        await tx.produto.update({
+          where: { id: item.productId },
+          data: {
+            estoque: {
+              decrement: item.quantity,
+            },
+          },
+        });
+      }
 
-    res.json({ message: "Compra realizada com sucesso", sale });
-  } catch (err) {
-    res.status(500).json({ error: "Erro ao finalizar compra" });
-  }
-});
-
-// Listar compras (cliente vê só dele, vendedor vê todas)
-router.get("/", auth, async (req, res) => {
-  try {
-    let sales;
-    if (req.user.role === "cliente") {
-      sales = await prisma.sale.findMany({
-        where: { clientId: req.user.id },
-        include: { products: true }
-      });
-    } else if (req.user.role === "vendedor") {
-      sales = await prisma.sale.findMany({
-        where: { vendorId: req.user.id },
-        include: { products: true }
-      });
-    }
-    res.json(sales);
-  } catch (err) {
-    res.status(500).json({ error: "Erro ao listar vendas" });
-  }
-});
-
-// Cancelar venda
-router.put("/:id/cancel", auth, async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const sale = await prisma.sale.findUnique({ where: { id: parseInt(id) } });
-    if (!sale) return res.status(404).json({ error: "Venda não encontrada" });
-
-    if (req.user.role === "cliente" && sale.clientId !== req.user.id) {
-      return res.status(403).json({ error: "Você só pode cancelar suas compras" });
-    }
-
-    if (req.user.role === "vendedor" && sale.vendorId !== req.user.id) {
-      return res.status(403).json({ error: "Você só pode cancelar suas vendas" });
-    }
-
-    await prisma.sale.update({
-      where: { id: parseInt(id) },
-      data: { status: "cancelada" }
+      return venda; 
     });
 
-    res.json({ message: "Venda cancelada com sucesso" });
-  } catch (err) {
-    res.status(500).json({ error: "Erro ao cancelar venda" });
+    res.status(201).json(novaVenda);
+
+  } catch (error) {
+    
+    res.status(400).json({ error: error.message });
   }
 });
 
 export default router;
-

@@ -38,7 +38,7 @@ model Produto {
   id              Int       @id @default(autoincrement())
   nome            String    @db.VarChar(100)
   descricao       String?
-  preco           Float     @db.Decimal(10, 2)
+  preco           Decimal     @db.Decimal(10, 2)
   estoque         Int       @default(0)
   vendedor_id     Int
   categoria       String?   @db.VarChar(50)
@@ -60,7 +60,7 @@ model Venda {
   vendedor_id     Int
   data_venda      DateTime  @default(now())
   status          String    @default("pendente") @db.VarChar(20)
-  total           Float     @db.Decimal(10, 2)
+  total           Decimal     @db.Decimal(10, 2)
   forma_pagamento String?   @db.VarChar(50)
   endereco_entrega String?
   data_atualizacao DateTime @default(now()) @updatedAt
@@ -78,8 +78,8 @@ model ItemVenda {
   venda_id        Int
   produto_id      Int
   quantidade      Int
-  preco_unitario  Float     @db.Decimal(10, 2)
-  subtotal        Float     @db.Decimal(10, 2)
+  preco_unitario  Decimal     @db.Decimal(10, 2)
+  subtotal        Decimal     @db.Decimal(10, 2)
   
   // Relações
   venda           Venda     @relation(fields: [venda_id], references: [id], onDelete: Cascade)
