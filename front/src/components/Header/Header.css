@@ -3,19 +3,19 @@
 ============================ */
 
 /* Cor de fundo da navbar */
-.navbar {
+.navbar-principal {
   background-color: #8b5e3c !important; /* marrom caramelo */
 }
 
 /* Estilo do nome/marca na navbar */
-.navbar-brand {
+.navbar-principal .navbar-brand {
   color: #FFA552 !important; /* laranja suave */
   font-family: 'Brush Script MT', cursive;
   font-size: 2rem;
 }
 
 /* Efeito hover na marca */
-.navbar-brand:hover {
+.navbar-principal .navbar-brand:hover {
   color: white !important;
 }
 
@@ -24,7 +24,7 @@
 ============================ */
 
 /* Links do menu de navegação */
-.navbar-nav .nav-link {
+.navbar-principal .navbar-nav .nav-link {
   color: #FFA552 !important; /* laranja suave */
   font-family: 'Georgia', serif;
   font-weight: bold;
@@ -32,7 +32,7 @@
 }
 
 /* Hover nos links */
-.navbar-nav .nav-link:hover {
+.navbar-principal .navbar-nav .nav-link:hover {
   background-color: #f59e3b; /* cor ao passar o mouse */
   color: white !important;
   border-radius: 5px; /* cantos arredondados */
@@ -57,8 +57,8 @@
 ============================ */
 
 /* Input e botão da barra de pesquisa */
-.navbar-search-bar .form-control,
-.navbar-search-bar .btn {
+.navbar-principal .form-control,
+.navbar-principal .btn {
   height: 32px;
   font-size: 0.9rem;
   padding: 0.25rem 0.75rem;
@@ -67,19 +67,19 @@
 }
 
 /* Remove espaçamento superior do botão */
-.navbar-search-bar .btn {
+.navbar-principal .btn {
   margin-top: 0;
 }
 
 /* Estilo do campo de pesquisa */
-.navbar-search-bar .form-control {
+.navbar-principal .form-control {
   border: 2px solid #FFA552;
   border-radius: 10px;         /* cantos arredondados */
   outline: none;               /* remove contorno azul */
 }
 
 /* Foco no campo de pesquisa */
-.navbar-search-bar .form-control:focus {
+.navbar-principal .form-control:focus {
   border-color: #A0522D;       /* borda marrom mais escura */
   box-shadow: none;            /* remove brilho padrão */
 }
@@ -88,19 +88,30 @@
    Carrinho e Login
 ============================ */
 
-/* Estilo base para os ícones de carrinho e login */
+/* Base para ícones de carrinho e login */
 .cart-link,
 .login-link {
+  display: flex;
+  align-items: center;         /* alinha verticalmente */
+  justify-content: center;
   margin-left: 10px;
   position: relative;
   color: #FFA552 !important;
 }
 
+/* Tamanho consistente dos ícones */
+.cart-link svg,
+.login-link svg {
+  width: 1.2em;
+  height: 1.2em;
+  display: inline-block;
+}
+
 /* Indicador de quantidade no carrinho */
 .cart-badge {
   position: absolute;
-  top: -6px;
-  right: -6px;
+  top: -5px;
+  right: -5px;
   background-color: red;
   color: white;
   font-size: 0.75rem;
@@ -108,13 +119,7 @@
   border-radius: 50%; /* bolinha */
 }
 
-/* Centraliza verticalmente os ícones */
-.cart-link svg,
-.login-link svg {
-  vertical-align: middle;
-}
-
-/* Hover específico para o login, se quiser destacar igual os outros */
+/* Hover específico para o login */
 .login-link:hover {
   background-color: #f59e3b;
   border-radius: 5px;
@@ -122,12 +127,42 @@
 }
 
 /* ============================
-   Responsividade (opcional)
+   Responsividade
 ============================ */
 
-@media (max-width: 576px) {
+@media (max-width: 768px) {
+  /* Quando o menu colapsa, barra de pesquisa e links ficam em coluna */
+  .navbar-principal .d-flex {
+    flex-direction: column;
+    width: 100%;
+    margin-top: 0.5rem;
+  }
+
+  .navbar-principal .form-control {
+    margin-bottom: 0.5rem;
+    width: 100%;
+  }
+
   .cart-link,
   .login-link {
     margin-left: 5px; /* reduz espaço em telas pequenas */
   }
+}
+
+.cart-link,
+.login-link {
+  display: flex;
+  align-items: center;  /* centraliza verticalmente */
+  justify-content: center;
+  margin-left: 10px;
+  position: relative;
+  color: #FFA552 !important;
+  line-height: 0;       /* remove espaço extra dos SVGs */
+}
+
+.cart-link svg,
+.login-link svg {
+  width: 1.5em;         /* mesmo tamanho para ambos */
+  height: 1.5em;
+  display: block;       /* garante que o SVG não tenha espaço extra */
 }

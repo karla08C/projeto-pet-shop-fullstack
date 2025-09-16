@@ -8,7 +8,6 @@ function Produto({ produto }) {
 
   const handleAddToCart = () => {
     addToCart(produto);
-
     toast.success(`"${produto.titulo}" foi adicionado ao carrinho!`);
   };
 
@@ -24,7 +23,10 @@ function Produto({ produto }) {
         Preço: R$ {produto.preco.toFixed(2).replace('.', ',')}
       </p>
       <p className="produto-descricao">{produto.descricao}</p>
-      <button onClick={handleAddToCart} className="produto-botao-carrinho">
+      <button
+        onClick={handleAddToCart}
+        className="produto-botao-carrinho   btn btn-success"
+      >
         Adicionar ao Carrinho
       </button>
     </div>

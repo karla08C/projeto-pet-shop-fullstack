@@ -15,6 +15,7 @@ import Produto from './pages/Produto/Produto';
 import Historia from './pages/Historia/Historia';
 import Buscar from './pages/Buscar/Buscar';
 import Login from './pages/Login/Login';
+import LoginCadastro from './pages/LoginCadastro/LoginCadastro'; // 👈 importei aqui
 
 // IMPORTAÇÕES GLOBAIS
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -52,10 +53,11 @@ function App() {
           <Route path="/historia" element={<Historia />} />
           <Route path="/buscar" element={<Buscar />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/cadastro" element={<LoginCadastro />} />{' '}
+          {/* 👈 rota nova */}
         </Routes>
         <Footer />
-      </CartProvider>{' '}
-      {/* <-- PASSO 3: FECHE O PROVEDOR AQUI */}
+      </CartProvider>
     </Router>
   );
 }

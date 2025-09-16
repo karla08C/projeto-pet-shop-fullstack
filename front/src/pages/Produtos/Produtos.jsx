@@ -1,38 +1,49 @@
 import React, { useState, useMemo } from 'react';
-import Produto from '../Produto/Produto'; 
+import Produto from '../Produto/Produto';
 import './Produtos.css';
-
-//1. Criação de um "bd" simples para os produtos
 import { todosOsProdutos } from '../../data/produtosData.js';
 
 function Produtos() {
-  // 2. A constante 'todosOsProdutos' agora vem da importação,
-  //    não está mais declarada aqui dentro. O resto do código
-  //    continua funcionando da mesma forma!
-
   const [termoPesquisa, setTermoPesquisa] = useState('');
   const [ordenacao, setOrdenacao] = useState('nenhum');
+  const [paginaAtual, setPaginaAtual] = useState(1);
+  const produtosPorPagina = 12;
 
-  const produtosExibidos = useMemo(() => {
-    let produtosFiltrados = todosOsProdutos.filter(
+  const produtosFiltrados = useMemo(() => {
+    let produtos = todosOsProdutos.filter(
       (produto) =>
         produto.titulo.toLowerCase().includes(termoPesquisa.toLowerCase()) ||
-        produto.descricao.toLowerCase().includes(termoPesquisa.toLowerCase())
+        produto.descricao.toLowerCase().includes(termoPesquisa.toLowerCase()),
     );
 
     switch (ordenacao) {
       case 'mais-barato':
-        produtosFiltrados.sort((a, b) => a.preco - b.preco);
+        produtos.sort((a, b) => a.preco - b.preco);
         break;
       case 'mais-caro':
-        produtosFiltrados.sort((a, b) => b.preco - a.preco);
+        produtos.sort((a, b) => b.preco - a.preco);
         break;
       default:
-        // Nenhum ordenação extra necessária
         break;
     }
-    return produtosFiltrados;
-  }, [termoPesquisa, ordenacao]); // Removido todosOsProdutos da dependência, pois ele não muda.
+    return produtos;
+  }, [termoPesquisa, ordenacao]);
+
+  // Paginação
+  const indexUltimoProduto = paginaAtual * produtosPorPagina;
+  const indexPrimeiroProduto = indexUltimoProduto - produtosPorPagina;
+  const produtosPaginaAtual = produtosFiltrados.slice(
+    indexPrimeiroProduto,
+    indexUltimoProduto,
+  );
+
+  const totalPaginas = Math.ceil(produtosFiltrados.length / produtosPorPagina);
+  const numerosPaginas = Array.from({ length: totalPaginas }, (_, i) => i + 1);
+
+  const handleChangePage = (numero) => {
+    setPaginaAtual(numero);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="app-container">
@@ -49,7 +60,6 @@ function Produtos() {
             value={termoPesquisa}
             onChange={(e) => setTermoPesquisa(e.target.value)}
           />
-
           <select
             className="dropdown-ordenacao"
             value={ordenacao}
@@ -62,8 +72,8 @@ function Produtos() {
         </div>
 
         <div className="produtos-lista">
-          {produtosExibidos.length > 0 ? (
-            produtosExibidos.map((produto) => (
+          {produtosPaginaAtual.length > 0 ? (
+            produtosPaginaAtual.map((produto) => (
               <Produto key={produto.id} produto={produto} />
             ))
           ) : (
@@ -71,6 +81,32 @@ function Produtos() {
               Nenhum produto encontrado com a pesquisa ou filtros aplicados.
             </p>
           )}
+        </div>
+
+        <div className="paginacao">
+          <button
+            onClick={() => handleChangePage(paginaAtual - 1)}
+            disabled={paginaAtual === 1}
+          >
+            Anterior
+          </button>
+
+          {numerosPaginas.map((numero) => (
+            <button
+              key={numero}
+              onClick={() => handleChangePage(numero)}
+              className={numero === paginaAtual ? 'ativo' : ''}
+            >
+              {numero}
+            </button>
+          ))}
+
+          <button
+            onClick={() => handleChangePage(paginaAtual + 1)}
+            disabled={paginaAtual === totalPaginas}
+          >
+            Próximo
+          </button>
         </div>
       </section>
     </div>
