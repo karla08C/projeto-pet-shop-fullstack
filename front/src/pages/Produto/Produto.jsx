@@ -23,10 +23,7 @@ function Produto({ produto }) {
         Preço: R$ {produto.preco.toFixed(2).replace('.', ',')}
       </p>
       <p className="produto-descricao">{produto.descricao}</p>
-      <button
-        onClick={handleAddToCart}
-        className="produto-botao-carrinho   btn btn-success"
-      >
+      <button onClick={handleAddToCart} className="produto-botao-carrinho">
         Adicionar ao Carrinho
       </button>
     </div>

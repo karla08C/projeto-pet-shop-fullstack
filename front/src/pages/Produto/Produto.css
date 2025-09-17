@@ -53,20 +53,22 @@
 }
 
 .produto-botao-carrinho {
-  display: inline-block;
-  padding: 10px 20px;
-  background-color: #b27018; 
-  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
   border: none;
-  border-radius: 5px;
-  text-decoration: none; 
+  border-radius: 10px;
+  color: #8b5e3c!important;
+  background-color: #FFA552 !important;
+
   font-weight: bold;
-  transition: background-color 0.3s;
-  text-align: center;
-  width: 100%;
-  cursor: pointer; 
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .produto-botao-carrinho:hover {
-  background-color: #9a6015; 
+   background-color: #f59e3b !important;
+   color: white !important;
+  transform: scale(1.05);
 }
