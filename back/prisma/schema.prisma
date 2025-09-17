@@ -30,6 +30,7 @@ model Usuario {
   produtos_vendidos Produto[]  @relation("VendedorProdutos")
   vendas_realizadas Venda[]    @relation("VendedorVendas")
   compras_realizadas Venda[]   @relation("ClienteVendas")
+  agendamentos      Agendamento[]
   
   @@map("usuarios")
 }
@@ -87,4 +88,32 @@ model ItemVenda {
   
   @@map("itens_venda")
   @@unique([venda_id, produto_id])
+}
+
+model Servico {
+  id        Int      @id @default(autoincrement())
+  nome      String   @unique @db.VarChar(100)
+  descricao String?
+  preco     Decimal  @db.Decimal(10, 2)
+  duracao   Int      // Duração em minutos
+
+  // Relação
+  agendamentos Agendamento[]
+
+  @@map("servicos")
+}
+
+model Agendamento {
+  id         Int      @id @default(autoincrement())
+  cliente_id Int
+  servico_id Int
+  nome_pet   String   @db.VarChar(100)
+  data_hora  DateTime
+  status     String   @default("agendado") @db.VarChar(20) // Ex: 'agendado', 'concluido', 'cancelado'
+  
+  // Relações
+  cliente    Usuario  @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
+  servico    Servico  @relation(fields: [servico_id], references: [id], onDelete: Restrict)
+
+  @@map("agendamentos")
 }
