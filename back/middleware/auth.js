@@ -1,17 +1,17 @@
-
 import jwt from "jsonwebtoken";
-const SECRET = "segredo123";
 
-export function auth(req, res, next) {
-  const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(401).json({ error: "Token não fornecido" });
+export const verificarToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; // Bearer <token>
+
+  if (!token) return res.status(401).json({ erro: "Acesso negado, token não fornecido" });
 
   try {
-    const decoded = jwt.verify(token, SECRET);
-    req.user = decoded;
+    const segredo = "segredo"; // Mesmo segredo usado no login
+    const payload = jwt.verify(token, segredo);
+    req.usuarioId = payload.id; // Armazena o ID do usuário no request
     next();
-  } catch (err) {
-    res.status(401).json({ error: "Token inválido" });
+  } catch (error) {
+    return res.status(403).json({ erro: "Token inválido" });
   }
-}
-
+};
