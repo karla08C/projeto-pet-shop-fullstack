@@ -22,8 +22,8 @@ app.use(express.json());
 
 // Rotas
 app.use("/usuarios", usuarioRoutes); 
-app.use("/products", productRoutes)
-aapp.use("/vendas", vendaRoutes);
+app.use("/produtos", produtoRoutes)
+app.use("/vendas", vendaRoutes);
 app.use("/servicos", servicoRoutes);
 app.use('/agendamentos', agendamentoRoutes);
 app.use("/contatos", contatoRoutes);
