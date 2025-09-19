@@ -8,7 +8,6 @@ function Produto({ produto }) {
 
   const handleAddToCart = () => {
     addToCart(produto);
-
     toast.success(`"${produto.titulo}" foi adicionado ao carrinho!`);
   };
 

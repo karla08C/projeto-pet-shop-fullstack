@@ -27,7 +27,7 @@ function Login() {
 
         <div className="register-link">
           <p>
-            Não tem uma conta? <a href="#">Crie uma agora</a>
+            Não tem uma conta? <a href="/cadastro">Crie uma agora</a>
           </p>
         </div>
       </div>
