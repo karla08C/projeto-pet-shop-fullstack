@@ -113,36 +113,66 @@ function Agendamento() {
     setShowModal(false);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const { name, nomePet, data, hora, items, observacoes } = order;
+  const handleSubmit = async (e) => { // Adicione 'async' aqui
+  e.preventDefault();
+  const { name, nomePet, data, hora, items, observacoes, contato } = order;
 
-    if (!items.length) {
-      alert('Você precisa selecionar pelo menos um serviço.');
-      return;
-    }
+  if (!items.length) {
+    alert('Você precisa selecionar pelo menos um serviço.');
+    return;
+  }
 
-    alert(
-      `Agendamento realizado com sucesso, agradecemos a sua preferência!\n\n` +
-        `🐾 Dono: ${name}\n` +
-        `🐶 Pet: ${nomePet}\n` +
-        `📅 Data: ${data}\n` +
-        `⏰ Hora: ${hora}\n` +
-        `💬 Observações: ${observacoes || 'Nenhuma'}\n` +
-        `💰 Total: R$ ${calculateTotal(items).toFixed(2)}`,
-    );
-
-    setOrder({
-      name: '',
-      contato: '',
-      nomePet: '',
-      data: '',
-      hora: '',
-      observacoes: '',
-      items: [],
-    });
+  // Objeto com os dados a serem enviados para o back-end
+  const agendamentoData = {
+    nomeDono: name,
+    telefoneContato: contato,
+    nomePet: nomePet,
+    data: data,
+    hora: hora,
+    observacoes: observacoes,
+    // Note que você pode precisar adaptar a forma como 'items' é enviado,
+    // dependendo de como sua API espera receber os dados.
+    servicos: items.map(item => ({
+      categoria: item.category,
+      nomeServico: item.name,
+      quantidade: item.quantity,
+    })),
+    total: calculateTotal(items),
   };
 
+  try {
+    // Faça a requisição POST para o seu back-end
+    const response = await fetch('http://localhost:3001/agendamentos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(agendamentoData),
+    });
+
+    if (response.ok) { // Se a resposta for 200-299, a requisição foi um sucesso
+      alert('Agendamento realizado com sucesso!');
+      // Limpa o formulário após o sucesso
+      setOrder({
+        name: '',
+        contato: '',
+        nomePet: '',
+        data: '',
+        hora: '',
+        observacoes: '',
+        items: [],
+      });
+    } else {
+      // Se a resposta for um erro (4xx, 5xx), mostra uma mensagem de erro
+      const errorData = await response.json();
+      alert(`Erro ao agendar: ${errorData.message || 'Verifique o servidor.'}`);
+    }
+  } catch (error) {
+    // Captura erros de rede, como servidor offline ou CORS
+    console.error('Erro na requisição:', error);
+    alert('Não foi possível conectar com o servidor. Tente novamente mais tarde.');
+  }
+};
   return (
     <div className="order-container">
       <div className="order-box">

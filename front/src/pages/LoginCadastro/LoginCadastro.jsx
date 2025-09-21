@@ -10,12 +10,16 @@ function LoginCadastro() {
   const [cpfCnpj, setCpfCnpj] = useState('');
   const [telefone, setTelefone] = useState('');
   const [endereco, setEndereco] = useState('');
+  const [erro, setErro] = useState('');
+  const [sucesso, setSucesso] = useState('');
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setErro('');
+    setSucesso('');
 
     if (senha !== confirmarSenha) {
-      alert('As senhas não coincidem!');
+      setErro('As senhas não coincidem!');
       return;
     }
 
@@ -29,9 +33,39 @@ function LoginCadastro() {
       endereco,
     };
 
-    console.log('Usuário cadastrado:', novoUsuario);
-    // Aqui você faz a chamada para sua API:
-    // fetch("http://localhost:3000/usuario", { method: "POST", body: JSON.stringify(novoUsuario) })
+    try {
+      const response = await fetch('http://localhost:3001/usuarios/registrar', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(novoUsuario),
+      });
+
+      if (response.ok) {
+        // Se a resposta for 201 (Created), o cadastro foi um sucesso
+        const data = await response.json();
+        setSucesso('Usuário cadastrado com sucesso!');
+        console.log('Usuário cadastrado:', data);
+
+        // Limpar o formulário
+        setNome('');
+        setEmail('');
+        setSenha('');
+        setConfirmarSenha('');
+        setTipo('cliente');
+        setCpfCnpj('');
+        setTelefone('');
+        setEndereco('');
+      } else {
+        // Se a resposta for um erro (ex: 400, 409), exibe a mensagem de erro do backend
+        const errorData = await response.json();
+        setErro(errorData.message || 'Erro ao cadastrar. Tente novamente.');
+      }
+    } catch (error) {
+      console.error('Erro na requisição:', error);
+      setErro('Não foi possível conectar ao servidor. Verifique sua conexão.');
+    }
   };
 
   return (
@@ -46,7 +80,6 @@ function LoginCadastro() {
             onChange={(e) => setNome(e.target.value)}
             required
           />
-
           <input
             type="email"
             placeholder="E-mail"
@@ -54,7 +87,6 @@ function LoginCadastro() {
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-
           <input
             type="password"
             placeholder="Senha"
@@ -62,7 +94,6 @@ function LoginCadastro() {
             onChange={(e) => setSenha(e.target.value)}
             required
           />
-
           <input
             type="password"
             placeholder="Confirmar senha"
@@ -70,32 +101,31 @@ function LoginCadastro() {
             onChange={(e) => setConfirmarSenha(e.target.value)}
             required
           />
-
           <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
             <option value="cliente">Cliente</option>
             <option value="vendedor">Vendedor</option>
           </select>
-
           <input
             type="text"
             placeholder="CPF ou CNPJ"
             value={cpfCnpj}
             onChange={(e) => setCpfCnpj(e.target.value)}
           />
-
           <input
             type="text"
             placeholder="Telefone"
             value={telefone}
             onChange={(e) => setTelefone(e.target.value)}
           />
-
           <input
             type="text"
             placeholder="Endereço"
             value={endereco}
             onChange={(e) => setEndereco(e.target.value)}
           />
+
+          {erro && <p className="error-message">{erro}</p>}
+          {sucesso && <p className="success-message">{sucesso}</p>}
 
           <button type="submit" className="btn-loginCadastro">
             Cadastrar
