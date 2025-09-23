@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import asyncHandler from 'express-async-handler';
 
 const prisma = new PrismaClient();
 // A variável JWT_SECRET deve ser configurada no arquivo .env para produção
@@ -114,3 +115,23 @@ export const deletarUsuario = async (req, res) => {
         res.status(500).json({ erro: "Erro interno do servidor ao deletar usuário." });
     }
 };
+
+export const getUsuarioPerfil = asyncHandler(async (req, res) => {
+    // req.usuarioId foi adicionado pelo middleware verificarToken
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: req.usuarioId },
+    });
+  
+    if (usuario) {
+      // Retorne os dados, mas NUNCA a senha
+      res.json({
+        id: usuario.id,
+        nome: usuario.nome,
+        email: usuario.email,
+        tipo: usuario.tipo,
+      });
+    } else {
+      res.status(404);
+      throw new Error('Usuário não encontrado');
+    }
+  });

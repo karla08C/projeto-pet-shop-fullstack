@@ -7,9 +7,9 @@ export const verificarToken = (req, res, next) => {
   if (!token) return res.status(401).json({ erro: "Acesso negado, token não fornecido" });
 
   try {
-    const segredo = "segredo"; // Mesmo segredo usado no login
+    const segredo = process.env.JWT_SECRET; 
     const payload = jwt.verify(token, segredo);
-    req.usuarioId = payload.id; // Armazena o ID do usuário no request
+    req.usuarioId = payload.id; 
     next();
   } catch (error) {
     return res.status(403).json({ erro: "Token inválido" });
