@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import './Login.css';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router-dom'; // <-- MUDANÇA: Importar o useNavigate
 import { FaGoogle } from 'react-icons/fa';
 
 function Login() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const auth = useAuth();
+  const navigate = useNavigate(); // <-- MUDANÇA: Inicializar o hook de navegação
   const [erro, setErro] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErro(''); // Limpa mensagens de erro anteriores
+    setErro('');
 
     try {
+      // Nota: Verifique se a URL da sua API está correta (ex: com /api/ na frente)
       const response = await fetch('http://localhost:3001/usuarios/login', {
         method: 'POST',
         headers: {
@@ -20,20 +25,21 @@ function Login() {
         body: JSON.stringify({ email, senha }),
       });
 
-      if (response.ok) {
-        // Se a resposta for 200-299, o login foi um sucesso
-        const data = await response.json();
-        alert('Login bem-sucedido!');
-        
-        // Aqui você pode salvar o token ou informações do usuário (ex: em localStorage)
-        // localStorage.setItem('token', data.token);
+      const data = await response.json(); // <-- MUDANÇA: Parseia o JSON aqui para usar em ambos os casos
+      console.log('RESPOSTA COMPLETA DO BACKEND:', data);
 
-        // Opcional: Redirecionar o usuário para a página principal
-        window.location.href = '/'; 
+      if (response.ok) {
+        // --- A LÓGICA DE SUCESSO FOI ALTERADA AQUI ---
+
+        // 1. Chame a função login do AuthContext, passando os dados recebidos (token, usuário)
+        auth.login(data); // <-- MUDANÇA PRINCIPAL
+
+        // 2. Redirecione o usuário para uma página protegida
+        navigate('/perfil'); // <-- MUDANÇA: Use navigate em vez de window.location.href
+
       } else {
-        // Se o status for um erro (ex: 401, 404), exibe a mensagem de erro do backend
-        const errorData = await response.json();
-        setErro(errorData.message || 'Erro ao fazer login. Tente novamente.');
+        // Se o status for um erro, exibe a mensagem de erro do backend
+        setErro(data.message || 'Erro ao fazer login. Tente novamente.');
       }
     } catch (error) {
       console.error('Erro na requisição:', error);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 // NOSSAS PÁGINAS E COMPONENTES
 import Header from './components/Header/Header';
@@ -16,8 +16,10 @@ import Historia from './pages/Historia/Historia';
 import Buscar from './pages/Buscar/Buscar';
 import Login from './pages/Login/Login';
 import LoginCadastro from './pages/LoginCadastro/LoginCadastro';
-import CadastroProduto from './pages/Produtos/CadastroProduto'; // 👈 novo
-import EditarProduto from './pages/Produtos/EditarProduto.jsx'; // 👈 novo
+import CadastroProduto from './pages/Produtos/CadastroProduto';
+import EditarProduto from './pages/Produtos/EditarProduto.jsx';
+import PerfilPage from './pages/Perfil/PerfilPage';
+import ProtectedRoute from './pages/Login/ProtectedRoute'; 
 
 // IMPORTAÇÕES GLOBAIS
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -28,42 +30,50 @@ import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
-    <Router>
-      <CartProvider>
-        <ToastContainer
-          position="top-center"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
+    <CartProvider>
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
 
-        <Header />
-        <Routes>
-          <Route path="/inicio" element={<Inicio />} />
-          <Route path="/agendamento" element={<Agendamento />} />
-          <Route path="/produtos" element={<Produtos />} />
+      <Header />
+      <Routes>
+        {/* ============================================= */}
+        {/* GRUPO 1: ROTAS PÚBLICAS (Todos podem acessar) */}
+        {/* ============================================= */}
+        <Route path="/inicio" element={<Inicio />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/cadastro" element={<LoginCadastro />} />
+        <Route path="/produtos" element={<Produtos />} />
+        <Route path="/serviços" element={<Servicos />} />
+        <Route path="/contato" element={<Contatos />} />
+        <Route path="/sobre" element={<Sobre />} />
+        <Route path="/historia" element={<Historia />} />
+        <Route path="/buscar" element={<Buscar />} />
+
+        {/* ================================================= */}
+        {/* GRUPO 2: ROTAS PROTEGIDAS (Só usuários logados) */}
+        {/* ================================================= */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/perfil" element={<PerfilPage />} />
+          <Route path="/agendamento" element={<Agendamento />} /> 
           <Route path="/carrinho" element={<Carrinho />} />
-          <Route path="/serviços" element={<Servicos />} />
-          <Route path="/contato" element={<Contatos />} />
-          <Route path="/sobre" element={<Sobre />} />
-          <Route path="/historia" element={<Historia />} />
-          <Route path="/buscar" element={<Buscar />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/cadastro" element={<LoginCadastro />} />
-          <Route path="/cadastro-produto" element={<CadastroProduto />} />{' '}
-          {/* 👈 rota nova */}
-          <Route path="/editar-produto/:id" element={<EditarProduto />} />{' '}
-          {/* 👈 rota nova */}
-        </Routes>
-        <Footer />
-      </CartProvider>
-    </Router>
+          <Route path="/cadastro-produto" element={<CadastroProduto />} />
+          <Route path="/editar-produto/:id" element={<EditarProduto />} />
+          {/* Adicione aqui qualquer outra rota que precise de login */}
+        </Route>
+
+      </Routes>
+      <Footer />
+    </CartProvider>
   );
 }
 
