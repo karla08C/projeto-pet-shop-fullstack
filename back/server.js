@@ -1,10 +1,13 @@
-// C:\Users\Janiele\Documents\projeto-pet-shop-fullstack\back\server.js
 
 import express from "express";
 import cors from "cors";
 import path from 'path'; 
 import { fileURLToPath } from 'url';
 import { PrismaClient } from '@prisma/client';
+import carrinhoRoutes from './routes/carrinhoRoutes.js'; 
+
+import dotenv from 'dotenv';
+dotenv.config();
 
 import usuarioRoutes from './routes/usuarioRoutes.js';
 import produtoRoutes from './routes/produtoRoutes.js';
@@ -25,6 +28,7 @@ app.use("/usuarios", usuarioRoutes);
 app.use("/produtos", produtoRoutes)
 app.use("/vendas", vendaRoutes);
 app.use('/agendamentos', agendamentoRoutes);
+app.use('/api/carrinho', carrinhoRoutes);
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 

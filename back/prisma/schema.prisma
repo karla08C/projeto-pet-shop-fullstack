@@ -1,12 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
-  
 }
 
 datasource db {
@@ -15,89 +10,91 @@ datasource db {
 }
 
 model Usuario {
-  id              Int       @id @default(autoincrement())
-  nome            String    @db.VarChar(100)
-  email           String    @unique @db.VarChar(100)
-  senha           String    @db.VarChar(255)
-  tipo            String    @db.VarChar(20) // 'cliente' ou 'vendedor'
-  cpf_cnpj        String?   @unique @db.VarChar(20)
-  telefone        String?   @db.VarChar(20)
-  endereco        String?
-  data_criacao    DateTime  @default(now())
-  data_atualizacao DateTime @default(now()) @updatedAt
-  
-  // Relações
-  produtos_vendidos Produto[]  @relation("VendedorProdutos")
-  vendas_realizadas Venda[]    @relation("VendedorVendas")
-  compras_realizadas Venda[]   @relation("ClienteVendas")
-  agendamentos      Agendamento[]
-  
+  id                 Int           @id @default(autoincrement())
+  nome               String        @db.VarChar(100)
+  email              String        @unique @db.VarChar(100)
+  senha              String        @db.VarChar(255)
+  tipo               String        @db.VarChar(20) 
+  cpf_cnpj           String?       @unique @db.VarChar(20)
+  telefone           String?       @db.VarChar(20)
+  endereco           String?
+  data_criacao       DateTime      @default(now())
+  data_atualizacao   DateTime      @default(now()) @updatedAt
+
+
+  produtos_vendidos  Produto[]     @relation("VendedorProdutos")
+  vendas_realizadas  Venda[]       @relation("VendedorVendas")
+  compras_realizadas Venda[]       @relation("ClienteVendas")
+  agendamentos       Agendamento[]
+  carrinho           Carrinho?     @relation("ClienteCarrinho") 
+
   @@map("usuarios")
 }
 
 model Produto {
-  id              Int       @id @default(autoincrement())
-  nome            String    @db.VarChar(100)
-  descricao       String?
-  preco           Decimal     @db.Decimal(10, 2)
-  estoque         Int       @default(0)
-  vendedor_id     Int
-  categoria       String?   @db.VarChar(50)
-  imagem_url      String?   @db.VarChar(255)
-  ativo           Boolean   @default(true)
-  data_criacao    DateTime  @default(now())
-  data_atualizacao DateTime @default(now()) @updatedAt
-  
-  // Relações
-  vendedor        Usuario   @relation("VendedorProdutos", fields: [vendedor_id], references: [id], onDelete: Cascade)
-  itens_venda     ItemVenda[]
-  
+  id                 Int           @id @default(autoincrement())
+  nome               String        @db.VarChar(100)
+  descricao          String?
+  preco              Decimal       @db.Decimal(10, 2)
+  estoque            Int           @default(0)
+  vendedor_id        Int
+  categoria          String?       @db.VarChar(50)
+  imagem_url         String?       @db.VarChar(255)
+  ativo              Boolean       @default(true)
+  data_criacao       DateTime      @default(now())
+  data_atualizacao   DateTime      @default(now()) @updatedAt
+
+
+  vendedor         Usuario       @relation("VendedorProdutos", fields: [vendedor_id], references: [id], onDelete: Cascade)
+  itens_venda      ItemVenda[]
+  itens_carrinho   ItemCarrinho[] 
+
   @@map("produtos")
 }
 
 model Venda {
-  id              Int       @id @default(autoincrement())
-  cliente_id      Int
-  vendedor_id     Int
-  data_venda      DateTime  @default(now())
-  status          String    @default("pendente") @db.VarChar(20)
-  total           Decimal     @db.Decimal(10, 2)
-  forma_pagamento String?   @db.VarChar(50)
-  endereco_entrega String?
-  data_atualizacao DateTime @default(now()) @updatedAt
+  id                 Int        @id @default(autoincrement())
+  cliente_id         Int
+  vendedor_id        Int
+  data_venda         DateTime   @default(now())
+  status             String     @default("pendente") @db.VarChar(20)
+  total              Decimal    @db.Decimal(10, 2)
+  forma_pagamento    String?    @db.VarChar(50)
+  endereco_entrega   String?
+  data_atualizacao   DateTime   @default(now()) @updatedAt
+
   
-  // Relações
-  cliente         Usuario   @relation("ClienteVendas", fields: [cliente_id], references: [id], onDelete: Restrict)
-  vendedor        Usuario   @relation("VendedorVendas", fields: [vendedor_id], references: [id], onDelete: Restrict)
-  itens           ItemVenda[]
-  
+  cliente    Usuario     @relation("ClienteVendas", fields: [cliente_id], references: [id], onDelete: Restrict)
+  vendedor   Usuario     @relation("VendedorVendas", fields: [vendedor_id], references: [id], onDelete: Restrict)
+  itens      ItemVenda[]
+
   @@map("vendas")
 }
 
 model ItemVenda {
-  id              Int       @id @default(autoincrement())
-  venda_id        Int
-  produto_id      Int
-  quantidade      Int
-  preco_unitario  Decimal     @db.Decimal(10, 2)
-  subtotal        Decimal     @db.Decimal(10, 2)
+  id               Int     @id @default(autoincrement())
+  venda_id         Int
+  produto_id       Int
+  quantidade       Int
+  preco_unitario   Decimal @db.Decimal(10, 2)
+  subtotal         Decimal @db.Decimal(10, 2)
+
   
-  // Relações
-  venda           Venda     @relation(fields: [venda_id], references: [id], onDelete: Cascade)
-  produto         Produto   @relation(fields: [produto_id], references: [id], onDelete: Restrict)
-  
+  venda   Venda   @relation(fields: [venda_id], references: [id], onDelete: Cascade)
+  produto Produto @relation(fields: [produto_id], references: [id], onDelete: Restrict)
+
   @@map("itens_venda")
   @@unique([venda_id, produto_id])
 }
 
 model Servico {
-  id        Int      @id @default(autoincrement())
-  nome      String   @unique @db.VarChar(100)
-  descricao String?
-  preco     Decimal  @db.Decimal(10, 2)
-  duracao   Int      // Duração em minutos
+  id           Int           @id @default(autoincrement())
+  nome         String        @unique @db.VarChar(100)
+  descricao    String?
+  preco        Decimal       @db.Decimal(10, 2)
+  duracao      Int 
 
-  // Relação
+
   agendamentos Agendamento[]
 
   @@map("servicos")
@@ -109,11 +106,40 @@ model Agendamento {
   servico_id Int
   nome_pet   String   @db.VarChar(100)
   data_hora  DateTime
-  status     String   @default("agendado") @db.VarChar(20) // Ex: 'agendado', 'concluido', 'cancelado'
-  
-  // Relações
-  cliente    Usuario  @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
-  servico    Servico  @relation(fields: [servico_id], references: [id], onDelete: Restrict)
+  status     String   @default("agendado") @db.VarChar(20) 
+
+ 
+  cliente Usuario @relation(fields: [cliente_id], references: [id], onDelete: Cascade)
+  servico Servico @relation(fields: [servico_id], references: [id], onDelete: Restrict)
 
   @@map("agendamentos")
+}
+
+
+
+model Carrinho {
+  id                 Int           @id @default(autoincrement())
+  cliente_id         Int           @unique 
+  data_criacao       DateTime      @default(now())
+  data_atualizacao   DateTime      @updatedAt
+
+  
+  cliente            Usuario       @relation("ClienteCarrinho", fields: [cliente_id], references: [id], onDelete: Cascade)
+  itens              ItemCarrinho[]
+
+  @@map("carrinhos")
+}
+
+model ItemCarrinho {
+  id           Int @id @default(autoincrement())
+  carrinho_id  Int
+  produto_id   Int
+  quantidade   Int
+
+ 
+  carrinho Carrinho @relation(fields: [carrinho_id], references: [id], onDelete: Cascade)
+  produto  Produto  @relation(fields: [produto_id], references: [id], onDelete: Cascade)
+
+  @@map("itens_carrinho")
+  @@unique([carrinho_id, produto_id]) 
 }
