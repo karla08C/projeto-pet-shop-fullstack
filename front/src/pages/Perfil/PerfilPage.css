@@ -1,0 +1,86 @@
+/* Container principal da página de perfil */
+.profile-page-wrapper #main {
+    min-height: calc(100vh - 80px); /* Ajuste a altura se necessário */
+    padding: 4rem 1rem;
+  }
+  
+  /* Card de Perfil */
+  .profile-card {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 2.5rem;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.95); /* Leve transparência */
+  }
+  
+  /* Cabeçalho dentro do card (avatar e nome) */
+  .profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .profile-avatar {
+    font-size: 6rem; /* Tamanho do ícone */
+    color: #FFA552; /* Cor laranja principal */
+    margin-bottom: 1rem;
+  }
+  
+  .profile-header h3 {
+    color: #3e2723; /* Marrom escuro para o texto */
+    font-size: 1.8rem;
+    font-weight: 600;
+  }
+  
+  /* Linha divisória dentro do card */
+  .linha-divisoria-pequena {
+    height: 2px;
+    background-color: #8b5e3c;
+    border: none;
+    margin: 0 auto 2rem auto;
+    width: 50%;
+    border-radius: 6px;
+    opacity: 0.5;
+  }
+  
+  
+  /* Detalhes do perfil (ID, Email, Tipo) */
+  .profile-details {
+    text-align: left;
+    margin-bottom: 2.5rem;
+  }
+  
+  .profile-details p {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.1rem;
+    color: #3e2723;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .profile-details p:last-child {
+    border-bottom: none;
+  }
+  
+  .profile-details strong {
+    color: #8b5e3c; /* Marrom para os rótulos */
+    font-weight: 600;
+  }
+  
+  .user-type {
+    background-color: #FFA552;
+    color: #fff;
+    font-weight: bold;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    text-transform: capitalize;
+  }
+  
+  /* Botão de Logout */
+  .logout-button {
+    margin: 0 auto; /* O botão já tem a classe 'large' */
+  }
