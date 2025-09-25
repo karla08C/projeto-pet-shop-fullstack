@@ -1188,3 +1188,4 @@ export const todosOsProdutos = [
     imagem: 'https://images.petz.com.br/fotos/40013020000013_1752245210049.jpg',
   },
 ];
+export default todosOsProdutos; 

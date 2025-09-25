@@ -2,72 +2,54 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// =========================================================
+// 1. CRIAR AGENDAMENTO (Protegida - Usa o ID do Usuário Logado)
+// =========================================================
 export const createAppointment = async (req, res) => {
     try {
-        // Recebe os dados do front-end
-        const { nomeDono, telefoneContato, nomePet, data, hora, servicos, observacoes } = req.body;
-
-        // Concatena a data e a hora para criar um objeto Date
-        const data_hora = new Date(`${data}T${hora}:00`);
+        const clienteId =  parseInt(req.usuarioId); // <-- USA O ID INJETADO PELO MIDDLEWARE
         
-        // --- Lógica para o CLIENTE (agora chamado de USUARIO) ---
-        // Busca um usuário existente pelo telefone ou cria um novo
-        const usuarioExistente = await prisma.usuario.findFirst({
-            where: { telefone: telefoneContato }
-        });
-
-        let usuario;
-        if (usuarioExistente) {
-            usuario = usuarioExistente;
-        } else {
-            // Cria um novo usuário com os dados do formulário
-            usuario = await prisma.usuario.create({
-                data: {
-                    nome: nomeDono,
-                    telefone: telefoneContato,
-                    email: "email_nao_disponivel@exemplo.com", // Adicione lógica para obter email se disponível
-                    senha: "senha_padrao_ou_hash",
-                    tipo: "cliente",
-                },
-            });
+        if (!clienteId) {
+             return res.status(401).json({ error: "Acesso negado. Usuário não autenticado." });
         }
+        
+        const { nomePet, data, hora, servicos } = req.body;
+        
+        const data_hora = new Date(`${data}T${hora}:00`);
 
-        // --- Lógica para o SERVICO ---
-        // Pega apenas o primeiro serviço do array, pois o schema suporta apenas um
+        // --- Lógica para o SERVIÇO ---
         const nomeDoPrimeiroServico = servicos[0]?.nomeServico;
         
         if (!nomeDoPrimeiroServico) {
-            return res.status(400).json({ error: "Nenhum serviço foi selecionado." });
+             return res.status(400).json({ error: "Nenhum serviço foi selecionado." });
         }
 
         const servicoExistente = await prisma.servico.findFirst({
-            where: { nome: nomeDoPrimeiroServico }
+             where: { nome: nomeDoPrimeiroServico }
         });
 
         let servico;
         if (servicoExistente) {
-            servico = servicoExistente;
+             servico = servicoExistente;
         } else {
-            // Cria um novo serviço se ele não existe
-            servico = await prisma.servico.create({
-                data: {
-                    nome: nomeDoPrimeiroServico,
-                    descricao: "Descrição padrão", 
-                    preco: 0, 
-                    duracao: 30, // Duração padrão
-                }
-            });
+             // Cria um novo serviço se ele não existe
+             servico = await prisma.servico.create({
+                 data: {
+                     nome: nomeDoPrimeiroServico,
+                     descricao: "Descrição padrão", 
+                     preco: 0, 
+                     duracao: 30,
+                 }
+             });
         }
         
         // --- Cria o AGENDAMENTO ---
         const appointment = await prisma.agendamento.create({
             data: {
-                cliente_id: usuario.id,
+                cliente_id: clienteId, // Usa o ID do cliente logado
                 servico_id: servico.id,
                 nome_pet: nomePet,
                 data_hora: data_hora,
-                // O seu schema não tem um campo 'observacoes' no modelo Agendamento
-                // Adicione-o se for necessário
             }
         });
         
@@ -81,12 +63,17 @@ export const createAppointment = async (req, res) => {
     }
 };
 
+// =========================================================
+// 2. LISTAR AGENDAMENTOS
+// =========================================================
 export const getAllAppointments = async (req, res) => {
     try {
+        // Se esta rota for só para o Admin, a lógica está OK.
+        // Se for para o cliente, você deve filtrar por: where: { cliente_id:  parseInt(req.usuarioId) }
         const appointments = await prisma.agendamento.findMany({
             include: {
                 cliente: { select: { id: true, nome: true, email: true } },
-                servico: true // Agora inclui diretamente o serviço, sem a tabela de união
+                servico: true 
             }
         });
         res.status(200).json(appointments);
@@ -96,12 +83,15 @@ export const getAllAppointments = async (req, res) => {
     }
 };
 
+// =========================================================
+// 3. BUSCAR AGENDAMENTO POR ID
+// =========================================================
 export const getAppointmentById = async (req, res) => {
     try {
         const { id } = req.params;
         const appointment = await prisma.agendamento.findUnique({
             where: { id: parseInt(id) },
-            include: { cliente: true, servico: true } // Inclui diretamente o serviço
+            include: { cliente: true, servico: true }
         });
 
         if (!appointment) {
@@ -114,6 +104,9 @@ export const getAppointmentById = async (req, res) => {
     }
 };
 
+// =========================================================
+// 4. ATUALIZAR AGENDAMENTO
+// =========================================================
 export const updateAppointment = async (req, res) => {
     try {
         const { id } = req.params;
@@ -132,6 +125,9 @@ export const updateAppointment = async (req, res) => {
     }
 };
 
+// =========================================================
+// 5. DELETAR AGENDAMENTO
+// =========================================================
 export const deleteAppointment = async (req, res) => {
     try {
         const { id } = req.params;
