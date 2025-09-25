@@ -58,19 +58,19 @@ function App() {
         <Route path="/sobre" element={<Sobre />} />
         <Route path="/historia" element={<Historia />} />
         <Route path="/buscar" element={<Buscar />} />
+        
+        {/* Deixar agendamento e carrinho acessíveis para todos */}
+        <Route path="/agendamento" element={<Agendamento />} />
+        <Route path="/carrinho" element={<Carrinho />} />
 
         {/* ================================================= */}
         {/* GRUPO 2: ROTAS PROTEGIDAS (Só usuários logados) */}
         {/* ================================================= */}
         <Route element={<ProtectedRoute />}>
           <Route path="/perfil" element={<PerfilPage />} />
-          <Route path="/agendamento" element={<Agendamento />} /> 
-          <Route path="/carrinho" element={<Carrinho />} />
           <Route path="/cadastro-produto" element={<CadastroProduto />} />
           <Route path="/editar-produto/:id" element={<EditarProduto />} />
-          {/* Adicione aqui qualquer outra rota que precise de login */}
         </Route>
-
       </Routes>
       <Footer />
     </CartProvider>

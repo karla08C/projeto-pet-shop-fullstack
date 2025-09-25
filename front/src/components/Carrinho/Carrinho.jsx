@@ -2,9 +2,11 @@ import React from 'react';
 import { useCart } from '../../context/CartContext';
 import Swal from 'sweetalert2';
 import './Carrinho.css';
+import { useNavigate } from 'react-router-dom';
 
 const Carrinho = () => {
   const { cartItems, removeFromCart, clearCart } = useCart();
+  const navigate = useNavigate();
 
   const total = cartItems.reduce(
     (acc, item) => acc + item.preco * item.quantity,
@@ -12,6 +14,22 @@ const Carrinho = () => {
   );
 
   const handleFinalizarCompra = () => {
+    // 🔒 Verificação de login
+    const usuario = localStorage.getItem('usuario'); // precisa ser salvo no login
+    if (!usuario) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Você precisa estar logado!',
+        text: 'Faça login para finalizar sua compra.',
+        confirmButtonText: 'Login',
+        confirmButtonColor: '#28a745',
+      }).then(() => {
+        navigate('/login');
+      });
+      return;
+    }
+
+    // Compra finalizada
     Swal.fire({
       title: 'Compra Realizada!',
       text: 'Seu pedido foi concluído com sucesso.',
