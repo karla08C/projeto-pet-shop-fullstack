@@ -13,39 +13,36 @@ function Servicos() {
           {/* Card maior */}
           <div className="col-8">
             <article className="boxservico">
-              <h1>🐾Nossos Serviços🐾</h1>
+              <h1>Nossos Serviços</h1>
               <img src={pet1} alt="Consultas" className="img-responsive" />
               <header>
-                <p>Cuidado completo e carinho para seu pet!</p>
+                <p>No Pet Shop Feliz, o cuidado com seu animal de estimação vai muito além da estética. Nossos serviços são pensados para o bem-estar e a tranquilidade dele, garantindo uma experiência segura, agradável e completa.</p>
               </header>
               <p>
-                No Pet Shop Feliz, oferecemos um atendimento especializado que
-                vai além da estética...
+                Nossos Serviços Principais
+
+                Banho e Tosa: Oferecemos um tratamento completo, com produtos de alta qualidade e técnicas que respeitam a sensibilidade e o tipo de pelo de cada pet.
+                Consultas Veterinárias: Contamos com uma equipe de veterinários especializados para cuidar da saúde do seu melhor amigo, oferecendo diagnósticos, tratamentos e orientações personalizadas.
               </p>
               <p>
-                Todos os nossos serviços são pensados para o bem-estar dos
-                animais e a tranquilidade...
+                Infraestrutura e Diferenciais
+
+                Nosso espaço é totalmente preparado para receber seu pet com conforto e segurança. Temos ambientes climatizados e áreas de espera separadas para cães e gatos, minimizando o estresse e proporcionando uma experiência tranquila para todos.
               </p>
               <section>
                 <header>
                   <h3>Outros Serviços</h3>
                 </header>
                 <p>
-                  Além do banho e tosa, oferecemos consultas com veterinários
-                  especializados...
-                </p>
-                <p>
-                  Nosso espaço é climatizado, com áreas separadas para gatos e
-                  cachorros...
+                  Além dos serviços principais, oferecemos uma gama de opções para atender todas as necessidades do seu pet, como vacinação, exames clínicos e estética personalizada.
                 </p>
               </section>
               <section>
                 <header>
-                  <h3>Conclusão</h3>
+                  <h3>Nossa Missão</h3>
                 </header>
                 <p>
-                  Cuidar do seu pet é a nossa missão. Trabalhamos com
-                  responsabilidade, empatia...
+                  Cuidar do seu pet é a nossa missão e nossa paixão. Trabalhamos com responsabilidade, empatia e dedicação para garantir que seu animal de estimação tenha a vida feliz e saudável que ele merece.
                 </p>
               </section>
             </article>

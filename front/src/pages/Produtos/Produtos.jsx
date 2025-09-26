@@ -178,7 +178,7 @@ function Produtos() {
       <main className="produtos-area">
         <section className="sectionprodutos">
           <h2 align="center" className="h2produtos">
-            🐾 Nossos Produtos
+             Nossos Produtos
           </h2>
 
           {/* VISIBILIDADE: Botoes Cadastrar/Editar/Excluir */}

@@ -3,7 +3,7 @@
   position: relative;
   background: url('../../assets/imagens/Body.png') no-repeat center;
   background-size: cover;
-  color: #F9FAFB;
+  color: #e0972a;
   min-height: 100vh;
   padding: 4rem 1rem;
   overflow: hidden;
@@ -40,7 +40,7 @@
 /* Título */
 #h1 {
   font-size: 2.8rem;
-  font-family: 'Brush Script MT', cursive;
+  font-family: 'Georgia',sans-serif ;
   color: #FFA552;
   text-align: center;
   margin-bottom: 1.5rem;
@@ -49,8 +49,8 @@
 /* Parágrafos */
 .about p {
   font-size: 1.3rem;
-  font-family: 'Georgia', serif;
-  color: #FFA552 !important;
+  font-family: 'Georgia',sans-serif ;
+  color: #070707 !important;
   line-height: 1.7;
   margin-bottom: 1.2rem;
    text-shadow: none; /* remove a sombra */
@@ -86,7 +86,7 @@
 .galery figcaption {
   font-size: 1rem;
   margin-top: 0.5rem;
-  color: #5d4037; /* marrom médio */
+  color: #070707; /* marrom médio */
 }
 
 /* Modal de imagem */
