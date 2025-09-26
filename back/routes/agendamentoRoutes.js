@@ -1,7 +1,5 @@
-// routes/agendamentoRoutes.js
-
 import { Router } from 'express';
-import { verificarToken } from '../middleware/auth.js'; // AJUSTE O CAMINHO SE NECESSÁRIO
+import { verificarToken } from '../middleware/auth.js';
 import {
     createAppointment,
     getAllAppointments,
@@ -12,15 +10,9 @@ import {
 
 const router = Router();
 
-// ROTAS PROTEGIDAS:
-// 💡 CORREÇÃO: Adicione 'verificarToken' antes do controller.
+router.post('/', verificarToken, createAppointment);
 
-// A rota de criação de agendamento DEVE saber quem está agendando.
-router.post('/', verificarToken, createAppointment); 
-
-// As rotas de listagem, atualização e exclusão também precisam de autenticação,
-// geralmente para garantir que o usuário só veja/edite seus próprios dados.
-router.get('/', verificarToken, getAllAppointments); 
+router.get('/', verificarToken, getAllAppointments);
 
 router.get('/:id', verificarToken, getAppointmentById);
 

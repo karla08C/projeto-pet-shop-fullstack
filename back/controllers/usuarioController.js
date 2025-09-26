@@ -1,5 +1,3 @@
-// controllers/usuarioController.js
-
 import { PrismaClient } from '@prisma/client';
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -8,14 +6,12 @@ import asyncHandler from 'express-async-handler';
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
 
-// Checagem de segurança
 if (!JWT_SECRET) {
     console.error("ERRO FATAL: JWT_SECRET não está configurada no .env!");
-    // Não interromper aqui se o server.js já fez o dotenv.config()
 }
 
 // =========================================================
-// GERAÇÃO DE TOKEN (Garante que o ID seja um Int antes de ir para o JWT)
+// LOGIN DE USUÁRIO
 // =========================================================
 export const loginUsuario = asyncHandler(async (req, res) => {
     const { email, senha } = req.body;
@@ -24,11 +20,10 @@ export const loginUsuario = asyncHandler(async (req, res) => {
 
     if (usuario && (await bcrypt.compare(senha, usuario.senha))) {
         
-        // 💡 CORREÇÃO: Garante que o ID no payload do JWT é um INTEIRO
         const userIdInt = parseInt(usuario.id);
 
         const token = jwt.sign(
-            { id: userIdInt, tipo: usuario.tipo }, // ID é passado como INTEIRO
+            { id: userIdInt, tipo: usuario.tipo },
             JWT_SECRET, 
             { expiresIn: "8h" }
         );
@@ -38,7 +33,7 @@ export const loginUsuario = asyncHandler(async (req, res) => {
             nome: usuario.nome,
             email: usuario.email,
             tipo: usuario.tipo,
-            token, // Envia o token para o frontend
+            token,
         });
     } else {
         res.status(401);
@@ -48,26 +43,22 @@ export const loginUsuario = asyncHandler(async (req, res) => {
 
 
 // =========================================================
-// VERIFICAR PERFIL (Checa se o token é válido)
+// VERIFICAR PERFIL
 // =========================================================
 export const getUsuarioPerfil = asyncHandler(async (req, res) => {
-    // req.usuarioId é injetado pelo middleware (como string)
     
-    // 💡 CORREÇÃO CRÍTICA: Converte o ID para INTEIRO antes de usar no Prisma
     const usuarioId = parseInt(req.usuarioId); 
 
-    // Verifica se a conversão falhou (se req.usuarioId for undefined ou inválido)
     if (isNaN(usuarioId)) {
         res.status(401);
         throw new Error('ID de usuário inválido no token');
     }
 
     const usuario = await prisma.usuario.findUnique({
-      where: { id: usuarioId }, // Prisma agora busca com INTEIRO
+      where: { id: usuarioId },
     });
  
     if (usuario) {
-      // Retorna os dados do usuário
       res.json({
         id: usuario.id,
         nome: usuario.nome,
@@ -75,8 +66,6 @@ export const getUsuarioPerfil = asyncHandler(async (req, res) => {
         tipo: usuario.tipo,
       });
     } else {
-      // Se o token for válido mas o usuário não existir (usuário deletado),
-      // o frontend recebe 404 e desloga.
       res.status(404);
       throw new Error('Usuário não encontrado');
     }
@@ -84,17 +73,99 @@ export const getUsuarioPerfil = asyncHandler(async (req, res) => {
 
 
 // =========================================================
-// RESTANTE DAS FUNÇÕES (APLICA A CONVERSÃO DE ID ONDE NECESSÁRIO)
+// REGISTRAR NOVO USUÁRIO
 // =========================================================
-
 export const registrarUsuario = asyncHandler(async (req, res) => {
-    // ... (sua lógica de registro) ...
+    const { nome, email, senha, tipo } = req.body;
+
+    if (!nome || !email || !senha) {
+        res.status(400);
+        throw new Error('Por favor, preencha todos os campos obrigatórios.');
+    }
+
+    const usuarioExiste = await prisma.usuario.findUnique({ where: { email } });
+
+    if (usuarioExiste) {
+        res.status(400);
+        throw new Error('Usuário já existe com este e-mail');
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const senhaCriptografada = await bcrypt.hash(senha, salt);
+
+    const novoUsuario = await prisma.usuario.create({
+        data: {
+            nome,
+            email,
+            senha: senhaCriptografada,
+            tipo: tipo || 'Cliente', 
+        },
+    });
+
+    if (novoUsuario) {
+        const userIdInt = parseInt(novoUsuario.id);
+
+        const token = jwt.sign(
+            { id: userIdInt, tipo: novoUsuario.tipo },
+            JWT_SECRET,
+            { expiresIn: '8h' }
+        );
+
+        res.status(201).json({
+            id: novoUsuario.id,
+            nome: novoUsuario.nome,
+            email: novoUsuario.email,
+            tipo: novoUsuario.tipo,
+            token,
+        });
+    } else {
+        res.status(400);
+        throw new Error('Dados do usuário inválidos');
+    }
 });
 
+
+// =========================================================
+// LISTAR TODOS OS USUÁRIOS
+// =========================================================
 export const listarUsuarios = asyncHandler(async (req, res) => {
-    // ... (sua lógica de listagem) ...
+    const usuarios = await prisma.usuario.findMany({
+        select: {
+            id: true,
+            nome: true,
+            email: true,
+            tipo: true,
+            data_criacao: true, // CORRIGIDO: Usa o nome do campo do seu schema
+        },
+    });
+
+    res.status(200).json(usuarios);
 });
 
+
+// =========================================================
+// DELETAR USUÁRIO
+// =========================================================
 export const deletarUsuario = asyncHandler(async (req, res) => {
-    // ... (sua lógica de deletar) ...
+    const usuarioId = parseInt(req.params.id);
+
+    if (isNaN(usuarioId)) {
+        res.status(400);
+        throw new Error('ID de usuário inválido');
+    }
+
+    const usuario = await prisma.usuario.findUnique({
+        where: { id: usuarioId },
+    });
+
+    if (!usuario) {
+        res.status(404);
+        throw new Error('Usuário não encontrado');
+    }
+
+    await prisma.usuario.delete({
+        where: { id: usuarioId },
+    });
+
+    res.json({ mensagem: 'Usuário removido com sucesso' });
 });

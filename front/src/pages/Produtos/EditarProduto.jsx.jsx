@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import api from '../../services/api'; // Sua instância de API
+import { usePermissions } from '../../hooks/usePermissions'; // Hook para permissões
+import Swal from 'sweetalert2';
 
 export default function EditarProduto() {
-  const { id } = useParams(); // id do produto
+  const { id } = useParams(); 
   const navigate = useNavigate();
+  
+  const { isVendedor, authLoading } = usePermissions();
 
-  // Estado do formulário
   const [form, setForm] = useState({
     nome: '',
     descricao: '',
@@ -14,30 +18,49 @@ export default function EditarProduto() {
     categoria: '',
   });
 
-  const [imagem, setImagem] = useState(null); // Estado para novo arquivo
-  const [imagemPreview, setImagemPreview] = useState(''); // Preview da imagem atual
+  const [imagem, setImagem] = useState(null); // Variável que contém o OBJETO FILE para o backend
+  const [imagemPreview, setImagemPreview] = useState(''); // Variável que contém a URL para o <img>
+  const [loading, setLoading] = useState(true); 
 
+  // EFEITO: CARREGAR DADOS DO PRODUTO E VERIFICAR PERMISSÕES
   useEffect(() => {
-    // Simulando produto carregado do backend
-    const produtoFake = {
-      nome: 'Produto Exemplo',
-      descricao: 'Descrição do produto',
-      preco: 99.99,
-      estoque: 10,
-      categoria: 'Categoria X',
-      imagem_url: 'https://via.placeholder.com/150',
+    if (authLoading) return;
+
+    if (!isVendedor) {
+      alert('Acesso negado. Apenas vendedores podem editar produtos.');
+      navigate('/produtos');
+      return;
+    }
+
+    const fetchProduto = async () => {
+      try {
+        const response = await api.get(`/produtos/${id}`); 
+        const produto = response.data;
+
+        setForm({
+          nome: produto.nome || '',
+          descricao: produto.descricao || '',
+          preco: String(produto.preco || ''), 
+          estoque: String(produto.estoque || ''),
+          categoria: produto.categoria || '',
+        });
+        
+        // 🛑 URL BUSTING NO CARREGAMENTO: Garante que a imagem antiga não seja cacheada
+        const urlComBusting = produto.imagem_url 
+            ? `${produto.imagem_url}?v=${Date.now()}` 
+            : 'https://via.placeholder.com/150';
+
+        setImagemPreview(urlComBusting);
+      } catch (error) {
+        Swal.fire('Erro!', 'Não foi possível carregar o produto.', 'error');
+        navigate('/produtos');
+      } finally {
+        setLoading(false);
+      }
     };
 
-    setForm({
-      nome: produtoFake.nome,
-      descricao: produtoFake.descricao,
-      preco: produtoFake.preco,
-      estoque: produtoFake.estoque,
-      categoria: produtoFake.categoria,
-    });
-
-    setImagemPreview(produtoFake.imagem_url);
-  }, [id]);
+    fetchProduto();
+  }, [id, isVendedor, authLoading, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,25 +74,80 @@ export default function EditarProduto() {
     const arquivo = e.target.files[0];
     if (arquivo) {
       setImagem(arquivo);
-      setImagemPreview(URL.createObjectURL(arquivo)); // Preview local
+      // Cria a URL temporária do navegador para o preview
+      const localUrl = URL.createObjectURL(arquivo);
+      setImagemPreview(`${localUrl}?v=${Date.now()}`); 
     }
   };
 
-  const handleSubmit = (e) => {
+  // HANDLER DE SUBMISSÃO: CRIAÇÃO E ENVIO DO FormData
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isVendedor) return; 
 
-    // Para backend real, você criaria FormData e enviaria a imagem
-    console.log('Produto editado:', form);
-    console.log('Nova imagem selecionada:', imagem);
+    setLoading(true);
 
-    alert('Produto atualizado com sucesso!');
-    navigate('/produtos');
+    const formData = new FormData();
+    
+    // Adiciona os campos de texto
+    formData.append('nome', form.nome);
+    formData.append('descricao', form.descricao);
+    formData.append('preco', form.preco);
+    formData.append('estoque', form.estoque);
+    formData.append('categoria', form.categoria);
+    
+    // 🛑 ESSENCIAL: Anexa o OBJETO FILE (variável 'imagem')
+    if (imagem) {
+      formData.append('imagem', imagem); 
+    }
+
+    try {
+      // EXECUTA O PUT e recebe o objeto atualizado
+      const response = await api.put(`/produtos/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data', 
+        },
+      });
+
+      const updatedProduct = response.data; 
+
+      Swal.fire('Sucesso!', 'Produto atualizado com sucesso.', 'success');
+      
+      // 🛑 FORÇA O RECARREGAMENTO DA IMAGEM ATUALIZADA
+      const newImageUrl = updatedProduct.imagem_url 
+        ? `${updatedProduct.imagem_url}?v=${Date.now()}` 
+        : 'https://via.placeholder.com/150';
+
+      setImagemPreview(newImageUrl); 
+      setImagem(null); 
+      
+      // Navega para ver a lista atualizada
+      navigate('/produtos');
+      
+    } catch (error) {
+      const msg = error.response?.data?.message || 'Erro ao atualizar produto. Verifique a URL do backend.';
+      Swal.fire('Erro!', msg, 'error');
+    } finally {
+      setLoading(false);
+    }
   };
+
+
+  if (authLoading || loading) {
+    return <div className="container mt-4">Carregando produto e verificando permissões...</div>;
+  }
+  
+  if (!isVendedor) {
+    return null; 
+  }
+
 
   return (
     <div className="container mt-4">
-      <h2>Editar Produto</h2>
+      <h2>Editar Produto: {form.nome}</h2>
       <form onSubmit={handleSubmit} className="mt-3">
+        
+        {/* Campo Nome */}
         <div className="mb-3">
           <label className="form-label">Nome</label>
           <input
@@ -82,6 +160,7 @@ export default function EditarProduto() {
           />
         </div>
 
+        {/* Campo Descrição */}
         <div className="mb-3">
           <label className="form-label">Descrição</label>
           <textarea
@@ -92,6 +171,7 @@ export default function EditarProduto() {
           />
         </div>
 
+        {/* Campo Preço */}
         <div className="mb-3">
           <label className="form-label">Preço</label>
           <input
@@ -105,6 +185,7 @@ export default function EditarProduto() {
           />
         </div>
 
+        {/* Campo Estoque */}
         <div className="mb-3">
           <label className="form-label">Estoque</label>
           <input
@@ -116,6 +197,7 @@ export default function EditarProduto() {
           />
         </div>
 
+        {/* Campo Categoria */}
         <div className="mb-3">
           <label className="form-label">Categoria</label>
           <input
@@ -129,7 +211,7 @@ export default function EditarProduto() {
 
         {/* Upload de imagem */}
         <div className="mb-3">
-          <label className="form-label">Imagem do Produto</label>
+          <label className="form-label">Imagem do Produto (Atual)</label>
           {imagemPreview && (
             <div className="mb-2">
               <img
@@ -147,8 +229,8 @@ export default function EditarProduto() {
           />
         </div>
 
-        <button type="submit" className="btn btn-success">
-          Salvar Alterações
+        <button type="submit" className="btn btn-success" disabled={loading}>
+          {loading ? 'Salvando...' : 'Salvar Alterações'}
         </button>
       </form>
     </div>

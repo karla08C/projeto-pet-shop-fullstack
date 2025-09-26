@@ -1,7 +1,9 @@
-// middleware/auth.js
+import jwt from "jsonwebtoken";
+import asyncHandler from 'express-async-handler';
 
-import jwt from "jsonwebtoken"; // <--- Importação do JWT restaurada!
-
+// =======================================================
+// MIDDLEWARE DE AUTENTICAÇÃO (verificarToken)
+// =======================================================
 export const verificarToken = (req, res, next) => {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1]; 
@@ -9,13 +11,6 @@ export const verificarToken = (req, res, next) => {
     if (!token) return res.status(401).json({ erro: "Acesso negado, token não fornecido" });
 
     const segredo = process.env.JWT_SECRET;
-
-    // Log A: Diagnóstico da Chave Secreta
-    console.log("-----------------------------------------");
-    console.log("DIAGNÓSTICO AUTENTICAÇÃO:");
-    console.log("JWT_SECRET Length:", segredo ? segredo.length : "UNDEFINED"); 
-    console.log("Token recebido (primeiros 10 chars):", token.substring(0, 10));
-    console.log("-----------------------------------------");
 
     if (!segredo) {
         console.error("ERRO CRÍTICO: JWT_SECRET não carregado no ambiente!");
@@ -25,13 +20,30 @@ export const verificarToken = (req, res, next) => {
     try {
         const payload = jwt.verify(token, segredo);
         
-        // Log B: Sucesso na validação
-        console.log("✅ TOKEN VALIDADO. ID:", payload.id); 
+        // 🛑 ANEXAR ID E TIPO (CRUCIAL)
         req.usuarioId = payload.id; 
+        req.usuarioTipo = payload.tipo; 
+        
         next();
     } catch (error) {
-        // Log C: Falha na validação (Causa do Loop de Login)
-        console.log("❌ TOKEN FALHOU. Erro:", error.message); 
         return res.status(403).json({ erro: "Token inválido ou expirado" });
     }
 };
+
+// =======================================================
+// MIDDLEWARE DE AUTORIZAÇÃO (isVendedor)
+// =======================================================
+// 🛑 GARANTINDO O USO CORRETO DO asyncHandler
+export const isVendedor = asyncHandler(async (req, res, next) => {
+    // Obtém o tipo anexado por verificarToken
+    const tipo = req.usuarioTipo; 
+
+    // O código aqui já está assumindo que você corrigiu o BD para 'Vendedor' ou 'Admin'
+    if (tipo === 'vendedor' || tipo === 'Admin') {
+        next(); // Permissão concedida
+    } else {
+        res.status(403); // Proibido
+        // O asyncHandler garante que este erro será pego pelo errorHandler global.
+        throw new Error('Acesso negado. Você não tem permissão de Vendedor ou Administrador.');
+    }
+});

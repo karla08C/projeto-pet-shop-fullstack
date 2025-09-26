@@ -1,65 +1,53 @@
-// src/context/AuthContext.jsx
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import axios from 'axios';
-
-// 1. CONFIGURAÇÃO INICIAL (IMEDIATA)
-const initialToken = localStorage.getItem('token');
-
-// Configura o Axios para usar o token e lidar com cookies
-if (initialToken) {
-  axios.defaults.headers.common['Authorization'] = `Bearer ${initialToken}`;
-}
-axios.defaults.withCredentials = true; 
-// -----------------------------------------------------------
+import api from '../services/api'; // 🛑 CORREÇÃO: Importar a instância 'api'
+// import axios from 'axios'; // 🛑 REMOVIDO: Não é mais necessário
 
 const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [usuario, setUsuario] = useState(null);
-  const [token, setToken] = useState(initialToken);
-  const [loading, setLoading] = useState(true);
+    const [token, setToken] = useState(localStorage.getItem('token') || null);
+    const [usuario, setUsuario] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const verificarSessao = async () => {
-      if (token) { 
-        try {
-          // 💡 REFORÇO: Enviamos o token explicitamente no header desta requisição
-          const headers = { 'Authorization': `Bearer ${token}` };
-          
-          const { data } = await axios.get('http://localhost:3001/usuarios/perfil', { headers });
-          setUsuario(data);
-        } catch (error) {
-          console.error("Token inválido ou expirado", error);
-          logout();
-        }
-      }
-      setLoading(false);
+    useEffect(() => {
+        const verificarSessao = async () => {
+            if (token) {
+                try {
+                    // 🛑 CORREÇÃO CRÍTICA: Usar a instância 'api' que injeta o token
+                    const { data } = await api.get('/usuarios/perfil'); 
+                    
+                    setUsuario(data);
+                } catch (error) {
+                    console.error("Token inválido ou expirado", error);
+                    
+                    localStorage.removeItem('token'); 
+                    setToken(null);
+                }
+            }
+            setLoading(false);
+        };
+        
+        verificarSessao();
+    }, [token]);
+
+    const login = ({ token, usuario }) => {
+        localStorage.setItem('token', token);
+        setToken(token);
+        setUsuario(usuario);
+        // O interceptor em api.js cuida do cabeçalho
     };
-    
-    // Roda a verificação de sessão
-    verificarSessao();
-  }, [token]); // Dependência em [token] garante que o efeito roda se o token mudar
 
-  const login = ({ token, usuario }) => {
-    localStorage.setItem('token', token);
-    setToken(token);
-    setUsuario(usuario);
-    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; 
-  };
+    const logout = () => {
+        localStorage.removeItem('token');
+        setToken(null);
+        setUsuario(null);
+    };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
-    setToken(null);
-    setUsuario(null);
-  };
-
-  return (
-    <AuthContext.Provider value={{ token, usuario, login, logout, loading }}>
-      {/* Renderiza os filhos SOMENTE após a checagem */}
-      {!loading && children}
-    </AuthContext.Provider>
-  );
+    return (
+        <AuthContext.Provider value={{ token, usuario, login, logout, loading }}>
+            {children}
+        </AuthContext.Provider>
+    );
 };

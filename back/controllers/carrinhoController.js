@@ -1,33 +1,28 @@
-// controllers/carrinhoController.js
-
 import { PrismaClient } from '@prisma/client';
-import asyncHandler from 'express-async-handler'; // ⬅️ LINHA ESSENCIAL ADICIONADA
+import asyncHandler from 'express-async-handler';
 
 const prisma = new PrismaClient();
 
-// Funções utilitárias
+// Função auxiliar para garantir que o ID do JWT seja um número inteiro
 const getUserId = (req) => {
-    // Garante que o ID do JWT é um Int
     return parseInt(req.usuarioId);
 };
 
 // =========================================================
-// 1. ADICIONAR AO CARRINHO (CORREÇÃO FINAL DE TIPAGEM E BUSCA)
+// 1. ADICIONAR AO CARRINHO
 // =========================================================
 export const adicionarAoCarrinho = asyncHandler(async (req, res) => {
-    // Converte IDs e quantidade que vêm no req.body
     const produtoId = parseInt(req.body.produtoId);
-    const quantidade = parseInt(req.body.quantidade); 
+    const quantidade = parseInt(req.body.quantidade);
     
     const usuarioId = getUserId(req); 
     
-    // Validação robusta de todos os IDs
     if (isNaN(usuarioId) || isNaN(produtoId) || isNaN(quantidade) || quantidade <= 0) {
         res.status(400);
         throw new Error('Dados de produto ou usuário inválidos.');
     }
     
-    // 1. Buscar o produto para validar se ele existe
+    // 1. Busca e verifica o produto
     const produto = await prisma.produto.findUnique({
         where: { id: produtoId },
     });
@@ -37,32 +32,30 @@ export const adicionarAoCarrinho = asyncHandler(async (req, res) => {
         throw new Error('Produto não encontrado no catálogo.');
     }
     
-    // 2. Buscar ou Criar o Carrinho (Usando cliente_id, findFirst)
-let carrinho = await prisma.carrinho.findFirst({
-    where: { cliente_id: usuarioId },
-});
+    // 2. Busca ou Cria o Carrinho
+    let carrinho = await prisma.carrinho.findFirst({
+        where: { cliente_id: usuarioId },
+    });
 
-if (!carrinho) {
-    // 💡 CORREÇÃO: CRIAÇÃO DO CARRINHO (Linha 53)
-    // Tenta criar APENAS SE o usuário existir na tabela 'Usuario'
-    try {
-        carrinho = await prisma.carrinho.create({
-            data: { cliente_id: usuarioId },
-        });
-    } catch (createError) {
-        // Se a criação falhar (ex: usuário com este ID não existe), 
-        // retorne 400 (Bad Request) para o frontend.
-        console.error("ERRO AO CRIAR CARRINHO (ID Inválido):", createError.message);
-        res.status(400);
-        throw new Error('Não foi possível criar o carrinho. Usuário logado inválido.');
+    if (!carrinho) {
+        try {
+            carrinho = await prisma.carrinho.create({
+                data: { cliente_id: usuarioId },
+            });
+        } catch (createError) {
+            console.error("ERRO AO CRIAR CARRINHO (ID Inválido):", createError.message);
+            res.status(400);
+            throw new Error('Não foi possível criar o carrinho. Usuário logado inválido.');
+        }
     }
-}
 
-    // 3. Buscar/Atualizar Item do Carrinho
-    const itemExistente = await prisma.itemCarrinho.findFirst({
+    // 3. Busca/Atualiza o Item do Carrinho usando a chave única composta
+    const itemExistente = await prisma.itemCarrinho.findUnique({
         where: {
-            carrinhoId: carrinho.id,
-            produtoId: produtoId,
+            carrinho_id_produto_id: {
+                carrinho_id: carrinho.id,
+                produto_id: produtoId,
+            }
         },
     });
 
@@ -74,8 +67,8 @@ if (!carrinho) {
     } else {
         await prisma.itemCarrinho.create({
             data: {
-                carrinhoId: carrinho.id,
-                produtoId: produtoId,
+                carrinho_id: carrinho.id,
+                produto_id: produtoId,
                 quantidade: quantidade,
             },
         });
@@ -90,7 +83,6 @@ if (!carrinho) {
 export const verCarrinho = asyncHandler(async (req, res) => {
     const usuarioId = getUserId(req); 
 
-    // ✅ CORRETO: findFirst e cliente_id
     const carrinho = await prisma.carrinho.findFirst({
       where: { cliente_id: usuarioId },
       include: {
@@ -103,6 +95,7 @@ export const verCarrinho = asyncHandler(async (req, res) => {
     });
 
     if (!carrinho) {
+      // Retorna uma estrutura vazia em vez de 404 para o frontend
       return res.json({ itens: [], total: 0 }); 
     }
 
@@ -110,12 +103,14 @@ export const verCarrinho = asyncHandler(async (req, res) => {
 });
 
 // =========================================================
-// 3. FINALIZAR COMPRA
+// 3. FINALIZAR COMPRA (TRANSAÇÃO)
 // =========================================================
 export const finalizarCompra = asyncHandler(async (req, res) => {
     const usuarioId = getUserId(req); 
+    
+    // Assumimos que o frontend pode enviar informações de pagamento/entrega
+    const { formaPagamento, enderecoEntrega } = req.body; 
 
-    // ✅ CORRETO: findFirst e cliente_id
     const carrinho = await prisma.carrinho.findFirst({
       where: { cliente_id: usuarioId },
       include: { itens: { include: { produto: true } } },
@@ -126,35 +121,44 @@ export const finalizarCompra = asyncHandler(async (req, res) => {
       throw new Error('Seu carrinho está vazio');
     }
 
+    // Garante que o cálculo é feito com precisão (parseFloat)
     const valorTotal = carrinho.itens.reduce(
-      (acc, item) => acc + item.produto.preco * item.quantidade,
+      (acc, item) => acc + parseFloat(item.produto.preco) * item.quantidade,
       0
-    );
+    ).toFixed(2);
+    
+    // 🛑 ATENÇÃO: É NECESSÁRIO QUE O USUÁRIO COM ID 1 EXISTA NO SEU BANCO DE DADOS
+    const VENDEDOR_PADRAO_ID = 1; 
 
     const venda = await prisma.$transaction(async (tx) => {
+      // 1. Cria a Venda
       const novaVenda = await tx.venda.create({
         data: {
           cliente_id: usuarioId, 
-          vendedor_id: 1, 
-          total: valorTotal,
-          // Inclua o restante dos campos obrigatórios aqui (ex: data_venda, status)
+          vendedor_id: VENDEDOR_PADRAO_ID, 
+          total: parseFloat(valorTotal),
           data_venda: new Date(),
-          status: 'concluida'
+          status: 'concluida',
+          // Campos obrigatórios do modelo Venda (verifique seu schema)
+          forma_pagamento: formaPagamento || 'Cartão/Pix', 
+          endereco_entrega: enderecoEntrega || 'Aguardando confirmação', 
         },
       });
 
+      // 2. Cria os Itens da Venda
       await tx.itemVenda.createMany({
         data: carrinho.itens.map((item) => ({
-          vendaId: novaVenda.id,
-          produto_id: item.produtoId, 
+          venda_id: novaVenda.id,
+          produto_id: item.produto.id, // ID do produto
           quantidade: item.quantidade,
           preco_unitario: item.produto.preco,
           subtotal: item.produto.preco * item.quantidade,
         })),
       });
 
+      // 3. Limpa o Carrinho
       await tx.itemCarrinho.deleteMany({
-        where: { carrinhoId: carrinho.id },
+        where: { carrinho_id: carrinho.id },
       });
 
       return novaVenda;
@@ -167,13 +171,12 @@ export const finalizarCompra = asyncHandler(async (req, res) => {
 });
 
 // =========================================================
-// 4. REMOVER DO CARRINHO (Lógica Padrão)
+// 4. REMOVER DO CARRINHO
 // =========================================================
 export const removerDoCarrinho = asyncHandler(async (req, res) => {
     const { itemId } = req.params;
     const usuarioId = getUserId(req);
 
-    // ✅ CORRETO: findFirst e cliente_id
     const carrinho = await prisma.carrinho.findFirst({ where: { cliente_id: usuarioId } });
 
     if (!carrinho) {
@@ -181,11 +184,10 @@ export const removerDoCarrinho = asyncHandler(async (req, res) => {
         throw new Error('Carrinho não encontrado.');
     }
 
-    // 2. Deleta o item do carrinho
     await prisma.itemCarrinho.delete({
         where: {
             id: parseInt(itemId),
-            carrinhoId: carrinho.id, 
+            carrinho_id: carrinho.id, 
         },
     });
 
